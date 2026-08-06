@@ -10,10 +10,18 @@ import '../../utils/formatters.dart';
 import '../product_detail/product_detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key, this.repository, this.initialQuery = ''});
+  const SearchScreen({
+    super.key,
+    this.repository,
+    this.initialQuery = '',
+    this.autofocus = false,
+    this.onBack,
+  });
 
   final ProductRepository? repository;
   final String initialQuery;
+  final bool autofocus;
+  final VoidCallback? onBack;
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -101,7 +109,8 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: _controller,
               onChanged: _onQueryChanged,
               onClear: () => _setQuery(''),
-              onBack: () => Navigator.of(context).pop(),
+              autofocus: widget.autofocus,
+              onBackTap: widget.onBack,
             ),
             Expanded(
               child: FutureBuilder<List<Product>>(
@@ -141,16 +150,21 @@ class _SearchField extends StatelessWidget {
     required this.controller,
     required this.onChanged,
     required this.onClear,
-    required this.onBack,
+    this.autofocus = false,
+    this.onBackTap,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
-  final VoidCallback onBack;
+  final bool autofocus;
+  final VoidCallback? onBackTap;
 
   @override
   Widget build(BuildContext context) {
+    final canPop = Navigator.of(context).canPop();
+    final showBack = canPop || onBackTap != null;
+
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -164,24 +178,32 @@ class _SearchField extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Material(
-            color: Colors.transparent,
-            shape: const CircleBorder(),
-            child: InkWell(
-              onTap: onBack,
-              customBorder: const CircleBorder(),
-              child: const SizedBox(
-                width: 40,
-                height: 40,
-                child: Icon(
-                  CupertinoIcons.chevron_back,
-                  color: AppColors.onSurface,
-                  size: 22,
+          if (showBack) ...[
+            Material(
+              color: Colors.transparent,
+              shape: const CircleBorder(),
+              child: InkWell(
+                onTap: () {
+                  if (onBackTap != null) {
+                    onBackTap!();
+                  } else if (canPop) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                customBorder: const CircleBorder(),
+                child: const SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(
+                    CupertinoIcons.chevron_back,
+                    color: AppColors.onSurface,
+                    size: 22,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 4),
+            const SizedBox(width: 4),
+          ],
           Expanded(
             child: Container(
               height: 44,
@@ -205,7 +227,7 @@ class _SearchField extends StatelessWidget {
                     child: TextField(
                       controller: controller,
                       onChanged: onChanged,
-                      autofocus: true,
+                      autofocus: autofocus,
                       cursorColor: AppColors.primary,
                       textInputAction: TextInputAction.search,
                       style: AppTypography.bodyMd.copyWith(

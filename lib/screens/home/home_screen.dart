@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openSearch() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => SearchScreen(repository: _repository),
+        builder: (_) => SearchScreen(repository: _repository, autofocus: true),
       ),
     );
   }
@@ -82,7 +82,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTabBody() {
     switch (_selectedTab) {
       case 1:
-        return SearchScreen(repository: _repository);
+        return SearchScreen(
+          repository: _repository,
+          onBack: () => setState(() => _selectedTab = 0),
+        );
       case 2:
         return WishlistScreen(
           onExploreTap: () => setState(() => _selectedTab = 0),
