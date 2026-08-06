@@ -1,141 +1,315 @@
+import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/product.dart';
-import '../state/scopes.dart';
-import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
-import '../utils/format.dart';
-import 'product_image.dart';
+import '../utils/formatters.dart';
 
-class ProductCard extends StatelessWidget {
-  const ProductCard({
-    super.key,
-    required this.product,
-    required this.onTap,
-  });
+class ProductCard extends StatefulWidget {
+  const ProductCard({super.key, required this.product, this.onTap, this.onAdd});
 
   final Product product;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final VoidCallback? onAdd;
+
+  @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  bool _isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
-    final cart = CartScope.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: ProductImage(product: product),
-                ),
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: _QuickAddButton(
-                    onTap: () {
-                      cart.add(product);
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(
-                          SnackBar(
-                            content: Text('Added to bag · ${product.title}'),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                    },
-                  ),
-                ),
-              ],
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.9),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 18,
+            spreadRadius: 0,
+            offset: const Offset(0, 6),
           ),
-          const SizedBox(height: 10),
-          Text(
-            AppColors.labelFor(product.category).toUpperCase(),
-            style: AppTheme.sansStyle(
-              size: 9.5,
-              weight: FontWeight.w600,
-              color: AppColors.stone,
-              letterSpacing: 1.8,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(height: 3),
-          Text(
-            product.title,
-            style: AppTheme.sansStyle(
-              size: 13,
-              weight: FontWeight.w600,
-              height: 1.25,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 5),
-          Row(
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onTap,
+          splashColor: AppColors.primary.withValues(alpha: 0.08),
+          highlightColor: AppColors.primary.withValues(alpha: 0.04),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                formatPrice(product.price),
-                style: AppTheme.sansStyle(
-                  size: 14,
-                  weight: FontWeight.w700,
-                  letterSpacing: -0.2,
+              AspectRatio(
+                aspectRatio: 1.1,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _ProductImage(url: widget.product.imageUrl),
+                    // Rating Pill Overlay (iOS Frosted Glass)
+                    Positioned(
+                      bottom: 6,
+                      left: 6,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  CupertinoIcons.star_fill,
+                                  size: 11,
+                                  color: AppColors.starRating,
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  '${widget.product.rating}',
+                                  style: AppTypography.labelMd.copyWith(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Favorite Toggle Button (iOS Frosted Glass)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: _FavoriteButton(
+                        isFavorite: _isFavorite,
+                        onToggle: () {
+                          setState(() {
+                            _isFavorite = !_isFavorite;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
-              const Icon(Icons.star_rounded, size: 13, color: Color(0xFFD9A33A)),
-              const SizedBox(width: 2),
-              Text(
-                product.rating.toStringAsFixed(1),
-                style: AppTheme.sansStyle(
-                  size: 11,
-                  weight: FontWeight.w600,
-                  color: AppColors.stone,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryContainer
+                                  .withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              widget.product.category.toUpperCase(),
+                              style: AppTypography.labelMd.copyWith(
+                                color: AppColors.primary,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.product.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.labelLg.copyWith(
+                              color: AppColors.onBackground,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              formatMoney(widget.product.price),
+                              style: AppTypography.titleLg.copyWith(
+                                color: AppColors.onBackground,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryGradient,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(alpha: 0.35),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: widget.onAdd,
+                                borderRadius: BorderRadius.circular(10),
+                                child: const Center(
+                                  child: Icon(
+                                    CupertinoIcons.add,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _QuickAddButton extends StatelessWidget {
-  const _QuickAddButton({required this.onTap});
+class _FavoriteButton extends StatelessWidget {
+  const _FavoriteButton({required this.isFavorite, required this.onToggle});
 
-  final VoidCallback onTap;
+  final bool isFavorite;
+  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: Container(
-          width: 34,
-          height: 34,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: isFavorite
+                ? AppColors.accent.withValues(alpha: 0.18)
+                : Colors.white.withValues(alpha: 0.8),
             shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.9),
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.ink.withValues(alpha: 0.10),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
-          child: const Icon(
-            Icons.add_rounded,
-            size: 20,
-            color: AppColors.ink,
+          child: Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            child: InkWell(
+              onTap: onToggle,
+              customBorder: const CircleBorder(),
+              child: Padding(
+                padding: const EdgeInsets.all(7),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  transitionBuilder: (child, animation) =>
+                      ScaleTransition(scale: animation, child: child),
+                  child: Icon(
+                    isFavorite
+                        ? CupertinoIcons.heart_fill
+                        : CupertinoIcons.heart,
+                    key: ValueKey<bool>(isFavorite),
+                    size: 16,
+                    color: isFavorite
+                        ? AppColors.accent
+                        : AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProductImage extends StatelessWidget {
+  const _ProductImage({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return ColoredBox(
+          color: AppColors.chipInactive,
+          child: Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) => ColoredBox(
+        color: AppColors.chipInactive,
+        child: const Center(
+          child: Icon(CupertinoIcons.photo, color: AppColors.onSurfaceVariant),
         ),
       ),
     );
