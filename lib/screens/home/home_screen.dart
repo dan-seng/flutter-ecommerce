@@ -12,6 +12,7 @@ import '../cart/cart_screen.dart';
 import '../product_detail/product_detail_screen.dart';
 import '../profile/profile_screen.dart';
 import '../search/search_screen.dart';
+import '../wishlist/wishlist_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.repository});
@@ -52,11 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _openCart() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const CartScreen()),
-    );
-  }
 
   void _openSearch() {
     Navigator.of(context).push(
@@ -80,27 +76,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onTabSelected(int index) {
-    if (index == 3) {
-      _openCart();
-      return;
-    }
-    if (index == 4) {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const ProfileScreen()),
-      );
-      return;
-    }
     setState(() => _selectedTab = index);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final cart = CartScope.watch(context);
-
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
+  Widget _buildTabBody() {
+    switch (_selectedTab) {
+      case 1:
+        return SearchScreen(repository: _repository);
+      case 2:
+        return WishlistScreen(
+          onExploreTap: () => setState(() => _selectedTab = 0),
+        );
+      case 3:
+        return const CartScreen();
+      case 4:
+        return const ProfileScreen();
+      case 0:
+      default:
+        return Column(
           children: [
             const _HomeHeader(),
             Expanded(
@@ -131,7 +124,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
-        ),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cart = CartScope.watch(context);
+
+    return Scaffold(
+      body: SafeArea(
+        bottom: false,
+        child: _buildTabBody(),
       ),
       bottomNavigationBar: IndigoBottomNavBar(
         currentIndex: _selectedTab,

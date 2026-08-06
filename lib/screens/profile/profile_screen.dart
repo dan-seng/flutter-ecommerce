@@ -88,24 +88,28 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Material(
-            color: Colors.transparent,
-            shape: const CircleBorder(),
-            child: InkWell(
-              onTap: onBack,
-              customBorder: const CircleBorder(),
-              child: const SizedBox(
-                width: 40,
-                height: 40,
-                child: Icon(
-                  CupertinoIcons.chevron_back,
-                  color: AppColors.onSurface,
-                  size: 22,
+          if (Navigator.of(context).canPop()) ...[
+            Material(
+              color: Colors.transparent,
+              shape: const CircleBorder(),
+              child: InkWell(
+                onTap: onBack,
+                customBorder: const CircleBorder(),
+                child: const SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(
+                    CupertinoIcons.chevron_back,
+                    color: AppColors.onSurface,
+                    size: 22,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 4),
+            const SizedBox(width: 4),
+          ] else ...[
+            const SizedBox(width: 4),
+          ],
           Expanded(
             child: Text(
               'Profile',
