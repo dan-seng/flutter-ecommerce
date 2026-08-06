@@ -1,35 +1,35 @@
 class Product {
-  final int id;
-  final String title;
-  final double price;
-  final String description;
-  final String category;
-  final String image;
-  final double rating;
-  final int ratingCount;
-
   const Product({
     required this.id,
-    required this.title,
-    required this.price,
+    required this.name,
     required this.description,
     required this.category,
-    required this.image,
+    required this.price,
     required this.rating,
-    required this.ratingCount,
+    required this.reviewCount,
+    required this.imageUrl,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
-    final rating = json['rating'];
+    final rating = json['rating'] as Map<String, dynamic>? ?? const {};
     return Product(
-      id: json['id'] as int,
-      title: json['title'] as String? ?? 'Untitled',
-      price: ((json['price'] as num?) ?? 0).toDouble(),
+      id: json['id'] as int? ?? 0,
+      name: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       category: json['category'] as String? ?? '',
-      image: json['image'] as String? ?? '',
-      rating: ((rating is Map ? rating['rate'] : null) as num?)?.toDouble() ?? 0,
-      ratingCount: (rating is Map ? rating['count'] : null) as int? ?? 0,
+      price: (json['price'] as num?)?.toDouble() ?? 0,
+      rating: (rating['rate'] as num?)?.toDouble() ?? 0,
+      reviewCount: (rating['count'] as num?)?.toInt() ?? 0,
+      imageUrl: json['image'] as String? ?? '',
     );
   }
+
+  final int id;
+  final String name;
+  final String description;
+  final String category;
+  final double price;
+  final double rating;
+  final int reviewCount;
+  final String imageUrl;
 }
