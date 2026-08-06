@@ -654,31 +654,36 @@ class _HomeHeader extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  width: 42,
-                  height: 42,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    gradient: AppColors.primaryGradient,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.25),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
                     ],
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Image.asset(
-                    'assets/images/app_logo_icon.jpg',
-                    fit: BoxFit.cover,
+                  child: const Center(
+                    child: Text(
+                      'A',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 17,
+                      ),
+                    ),
                   ),
                 ),
                 Positioned(
                   bottom: 1,
                   right: 1,
                   child: Container(
-                    width: 11,
-                    height: 11,
+                    width: 10,
+                    height: 10,
                     decoration: BoxDecoration(
                       color: const Color(0xFF10B981),
                       shape: BoxShape.circle,
@@ -691,40 +696,58 @@ class _HomeHeader extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: GestureDetector(
-              onTap: () => _openProfileSwitcher(context),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Welcome back,',
-                        style: AppTypography.labelMd.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                          fontSize: 11,
-                        ),
-                      ),
-                      const SizedBox(width: 3),
-                      const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        size: 14,
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    'Alex',
-                    style: AppTypography.titleLg.copyWith(
-                      color: AppColors.onSurface,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                      height: 1.2,
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    width: 32,
+                    height: 32,
+                    child: Image.asset(
+                      'assets/images/app_logo_icon.jpg',
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _openProfileSwitcher(context),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Welcome back,',
+                              style: AppTypography.labelMd.copyWith(
+                                color: AppColors.onSurfaceVariant,
+                                fontSize: 10,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 13,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'Alex',
+                          style: AppTypography.titleLg.copyWith(
+                            color: AppColors.onSurface,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           _HeaderIconButton(
