@@ -168,7 +168,7 @@ class _HomeFeed extends StatefulWidget {
 }
 
 class _HomeFeedState extends State<_HomeFeed> {
-  int _featuredLimit = 2;
+  int _featuredLimit = 6;
   bool _isLoadingMore = false;
 
   void _loadMore() async {
@@ -178,7 +178,7 @@ class _HomeFeedState extends State<_HomeFeed> {
     await Future<void>.delayed(const Duration(milliseconds: 300));
     if (mounted) {
       setState(() {
-        _featuredLimit += 4;
+        _featuredLimit += 6;
         _isLoadingMore = false;
       });
     }
@@ -212,7 +212,7 @@ class _HomeFeedState extends State<_HomeFeed> {
           selectedIndex: safeIndex,
           onSelected: (index) {
             setState(() {
-              _featuredLimit = 2;
+              _featuredLimit = 6;
             });
             widget.onCategorySelected(index);
           },

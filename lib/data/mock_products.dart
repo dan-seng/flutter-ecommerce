@@ -55,7 +55,7 @@ const sampleProducts = [
   ),
   Product(
     id: 5,
-    name: 'White Gold Plated Princess',
+    name: 'White Gold Plated Princess Solitaire Ring',
     description:
         'Classic Created Wedding Engagement Solitaire Diamond Promise Ring for Her.',
     category: 'jewelery',
@@ -74,5 +74,71 @@ const sampleProducts = [
     rating: 4.8,
     reviewCount: 470,
     imageUrl: 'https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg',
+  ),
+  Product(
+    id: 7,
+    name: 'Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance',
+    description:
+        '3D NAND flash are applied to deliver high transfer speeds and remarkable endurance.',
+    category: 'electronics',
+    price: 109.00,
+    rating: 4.8,
+    reviewCount: 319,
+    imageUrl: 'https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_.jpg',
+  ),
+  Product(
+    id: 8,
+    name: 'WD 2TB Elements Portable External Hard Drive - USB 3.0',
+    description:
+        'USB 3.0 and USB 2.0 Compatibility. Fast data transfers. Improve PC Performance.',
+    category: 'electronics',
+    price: 64.00,
+    rating: 3.3,
+    reviewCount: 203,
+    imageUrl: 'https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg',
+  ),
+  Product(
+    id: 9,
+    name: "BIYLACLESNE Women's 3-in-1 Snowboard Jacket Winter Coat",
+    description:
+        'Adjustable cuffs with snap closures, detachable hood, stand collar, front zip closure.',
+    category: "women's clothing",
+    price: 56.99,
+    rating: 2.6,
+    reviewCount: 235,
+    imageUrl: 'https://fakestoreapi.com/img/51Y5NI-I5jL._AC_UX679_.jpg',
+  ),
+  Product(
+    id: 10,
+    name: "Lock and Love Women's Removable Hooded Faux Leather Moto Biker Jacket",
+    description:
+        'Faux leather material for style and comfort, removable hood with drawstring.',
+    category: "women's clothing",
+    price: 29.95,
+    rating: 2.9,
+    reviewCount: 340,
+    imageUrl: 'https://fakestoreapi.com/img/81XH0e8fefL._AC_UY879_.jpg',
+  ),
+  Product(
+    id: 11,
+    name: 'Rain Jacket Women Windbreaker Striped Climbing Raincoats',
+    description:
+        'Lightweight, sun protection and waterproof. Easy to deal with light rain, quick-drying.',
+    category: "women's clothing",
+    price: 39.99,
+    rating: 3.8,
+    reviewCount: 679,
+    imageUrl: 'https://fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2.jpg',
+  ),
+  Product(
+    id: 12,
+    name: "MBJ Women's Solid Short Sleeve Boat Neck V Top",
+    description:
+        'Lightweight fabric with great stretch for comfort. Double stitching on bottom hem.',
+    category: "women's clothing",
+    price: 9.85,
+    rating: 4.7,
+    reviewCount: 130,
+    imageUrl: 'https://fakestoreapi.com/img/71z3kpMAYsL._AC_UY879_.jpg',
   ),
 ];
