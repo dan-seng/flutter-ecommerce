@@ -1,47 +1,36 @@
 import 'package:flutter/material.dart';
 
-import 'screens/app_shell.dart';
-import 'state/cart_controller.dart';
-import 'state/catalog_controller.dart';
-import 'state/scopes.dart';
+import 'screens/home/home_screen.dart';
+import 'services/fakestore_api.dart';
+import 'state/cart.dart';
+import 'state/cart_scope.dart';
 import 'theme/app_theme.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(DanApp(
-    cart: CartController(),
-    catalog: CatalogController(),
-    shell: ShellController(),
-  ));
+  runApp(const GebeyaApp());
 }
 
-class DanApp extends StatelessWidget {
-  const DanApp({
-    super.key,
-    required this.cart,
-    required this.catalog,
-    required this.shell,
-  });
+class GebeyaApp extends StatefulWidget {
+  const GebeyaApp({super.key, this.repository});
 
-  final CartController cart;
-  final CatalogController catalog;
-  final ShellController shell;
+  final ProductRepository? repository;
+
+  @override
+  State<GebeyaApp> createState() => _GebeyaAppState();
+}
+
+class _GebeyaAppState extends State<GebeyaApp> {
+  final Cart _cart = Cart();
 
   @override
   Widget build(BuildContext context) {
     return CartScope(
-      controller: cart,
-      child: CatalogScope(
-        controller: catalog,
-        child: ShellScope(
-          controller: shell,
-          child: MaterialApp(
-            title: 'Ember',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            home: const AppShell(),
-          ),
-        ),
+      cart: _cart,
+      child: MaterialApp(
+        title: 'Indigo',
+        debugShowCheckedModeBanner: false,
+        theme: buildAppTheme(),
+        home: HomeScreen(repository: widget.repository),
       ),
     );
   }
