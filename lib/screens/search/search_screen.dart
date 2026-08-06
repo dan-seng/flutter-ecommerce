@@ -287,34 +287,57 @@ class _SearchBody extends StatelessWidget {
     if (query.isEmpty) {
       return _SearchSuggestions(
         popularSearches: popularSearches,
+        products: products,
         onSuggestionTap: onSuggestionTap,
+        onProductTap: onProductTap,
+        onAddProduct: onAddProduct,
       );
     }
 
     final q = query.toLowerCase();
-    final results = products
-        .where((p) =>
-            p.name.toLowerCase().contains(q) ||
-            p.category.toLowerCase().contains(q))
-        .toList();
+    final results = products.where((p) {
+      final nameMatch = p.name.toLowerCase().contains(q);
+      final categoryMatch = p.category.toLowerCase().contains(q);
+      final descMatch = p.description.toLowerCase().contains(q);
+      final priceMatch = formatMoney(p.price).toLowerCase().contains(q);
+      return nameMatch || categoryMatch || descMatch || priceMatch;
+    }).toList();
 
     if (results.isEmpty) {
       return _NoResults(query: query);
     }
 
-    return ListView.separated(
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      itemCount: results.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
-      itemBuilder: (context, index) {
-        final product = results[index];
-        return _SearchResultTile(
-          product: product,
-          onTap: () => onProductTap(product),
-          onAdd: () => onAddProduct(product),
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 4),
+          child: Text(
+            'Found ${results.length} ${results.length == 1 ? 'result' : 'results'} for "$query"',
+            style: AppTypography.labelMd.copyWith(
+              color: AppColors.onSurfaceVariant,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.separated(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            itemCount: results.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final product = results[index];
+              return _SearchResultTile(
+                product: product,
+                onTap: () => onProductTap(product),
+                onAdd: () => onAddProduct(product),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -322,11 +345,17 @@ class _SearchBody extends StatelessWidget {
 class _SearchSuggestions extends StatelessWidget {
   const _SearchSuggestions({
     required this.popularSearches,
+    required this.products,
     required this.onSuggestionTap,
+    required this.onProductTap,
+    required this.onAddProduct,
   });
 
   final List<String> popularSearches;
+  final List<Product> products;
   final ValueChanged<String> onSuggestionTap;
+  final ValueChanged<Product> onProductTap;
+  final ValueChanged<Product> onAddProduct;
 
   @override
   Widget build(BuildContext context) {
@@ -340,7 +369,7 @@ class _SearchSuggestions extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Wrap(
           spacing: 10,
           runSpacing: 10,
@@ -386,6 +415,38 @@ class _SearchSuggestions extends StatelessWidget {
               ),
             );
           }).toList(),
+        ),
+        const SizedBox(height: 28),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Explore Catalog',
+              style: AppTypography.headlineMd.copyWith(
+                color: AppColors.onBackground,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Text(
+              '${products.length} items',
+              style: AppTypography.bodyMd.copyWith(
+                color: AppColors.onSurfaceVariant,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        ...products.map(
+          (p) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _SearchResultTile(
+              product: p,
+              onTap: () => onProductTap(p),
+              onAdd: () => onAddProduct(p),
+            ),
+          ),
         ),
       ],
     );
