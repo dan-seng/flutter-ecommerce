@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../state/theme_scope.dart';
 import '../../theme/app_theme.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -12,7 +13,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _notificationsEnabled = true;
-  bool _darkModeEnabled = false;
 
   static const _stats = [
     (value: '12', label: 'Orders', icon: CupertinoIcons.cube_box_fill),
@@ -54,25 +54,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 24),
                   _MenuSection(title: 'Account', items: _accountItems),
                   const SizedBox(height: 20),
-                  _MenuSection(
-                    title: 'Preferences',
-                    items: _generalItems,
-                    extraTiles: [
-                      _SwitchTile(
-                        icon: CupertinoIcons.bell_fill,
-                        label: 'Push Notifications',
-                        value: _notificationsEnabled,
-                        onChanged: (val) =>
-                            setState(() => _notificationsEnabled = val),
-                      ),
-                      _SwitchTile(
-                        icon: CupertinoIcons.moon_fill,
-                        label: 'Dark Mode',
-                        value: _darkModeEnabled,
-                        onChanged: (val) =>
-                            setState(() => _darkModeEnabled = val),
-                      ),
-                    ],
+                  Builder(
+                    builder: (context) {
+                      final themeController = ThemeScope.of(context);
+                      return _MenuSection(
+                        title: 'Preferences',
+                        items: _generalItems,
+                        extraTiles: [
+                          _SwitchTile(
+                            icon: CupertinoIcons.bell_fill,
+                            label: 'Push Notifications',
+                            value: _notificationsEnabled,
+                            onChanged: (val) =>
+                                setState(() => _notificationsEnabled = val),
+                          ),
+                          _SwitchTile(
+                            icon: CupertinoIcons.moon_fill,
+                            label: 'Dark Mode',
+                            value: themeController.isDarkMode,
+                            onChanged: (_) => themeController.toggleThemeMode(),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 28),
                   const _SignOutButton(),
@@ -472,7 +476,7 @@ class _QuickShortcutsGrid extends StatelessWidget {
           child: Container(
             margin: EdgeInsets.only(right: index == _items.length - 1 ? 0 : 10),
             child: Material(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
@@ -502,7 +506,7 @@ class _QuickShortcutsGrid extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.labelMd.copyWith(
-                          color: AppColors.onSurface,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w700,
                           fontSize: 11,
                         ),
@@ -549,7 +553,7 @@ class _MenuSection extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: AppColors.outlineVariant.withValues(alpha: 0.4),
@@ -641,7 +645,7 @@ class _MenuTile extends StatelessWidget {
               child: Text(
                 label,
                 style: AppTypography.bodyLg.copyWith(
-                  color: AppColors.onSurface,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
                 ),

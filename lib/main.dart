@@ -4,6 +4,7 @@ import 'screens/home/home_screen.dart';
 import 'services/fakestore_api.dart';
 import 'state/cart.dart';
 import 'state/cart_scope.dart';
+import 'state/theme_scope.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -24,13 +25,22 @@ class _GebeyaAppState extends State<GebeyaApp> {
 
   @override
   Widget build(BuildContext context) {
-    return CartScope(
-      cart: _cart,
-      child: MaterialApp(
-        title: 'Indigo',
-        debugShowCheckedModeBanner: false,
-        theme: buildAppTheme(),
-        home: HomeScreen(repository: widget.repository),
+    return ThemeScope(
+      child: CartScope(
+        cart: _cart,
+        child: Builder(
+          builder: (context) {
+            final themeController = ThemeScope.of(context);
+            return MaterialApp(
+              title: 'Indigo',
+              debugShowCheckedModeBanner: false,
+              theme: buildAppTheme(),
+              darkTheme: buildAppDarkTheme(),
+              themeMode: themeController.themeMode,
+              home: HomeScreen(repository: widget.repository),
+            );
+          },
+        ),
       ),
     );
   }

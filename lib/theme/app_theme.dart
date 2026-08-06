@@ -194,3 +194,50 @@ ThemeData buildAppTheme() {
     splashFactory: InkSparkle.splashFactory,
   );
 }
+
+ThemeData buildAppDarkTheme() {
+  final colorScheme = ColorScheme.dark(
+    primary: AppColors.primaryLight,
+    onPrimary: Colors.white,
+    primaryContainer: const Color(0xFF312E81),
+    onPrimaryContainer: const Color(0xFFC7D2FE),
+    secondary: AppColors.secondary,
+    onSecondary: Colors.white,
+    surface: const Color(0xFF0F172A),
+    onSurface: const Color(0xFFF8FAFC),
+    surfaceContainerHighest: const Color(0xFF1E293B),
+    onSurfaceVariant: const Color(0xFF94A3B8),
+    outline: const Color(0xFF475569),
+    outlineVariant: const Color(0xFF334155),
+    error: AppColors.error,
+    onError: Colors.white,
+  );
+
+  final base = ThemeData(
+    useMaterial3: true,
+    colorScheme: colorScheme,
+    fontFamily: AppTypography.fontFamily,
+    brightness: Brightness.dark,
+  );
+
+  return base.copyWith(
+    scaffoldBackgroundColor: const Color(0xFF020617),
+    textTheme: base.textTheme.copyWith(
+      displayLarge: AppTypography.displayLg.copyWith(color: const Color(0xFFF8FAFC)),
+      headlineLarge: AppTypography.headlineLg.copyWith(color: const Color(0xFFF8FAFC)),
+      headlineMedium: AppTypography.headlineMd.copyWith(color: const Color(0xFFF8FAFC)),
+      headlineSmall: AppTypography.headlineLgMobile.copyWith(color: const Color(0xFFF8FAFC)),
+      titleLarge: AppTypography.titleLg.copyWith(color: const Color(0xFFF8FAFC)),
+      bodyLarge: AppTypography.bodyLg.copyWith(color: const Color(0xFFE2E8F0)),
+      bodyMedium: AppTypography.bodyMd.copyWith(color: const Color(0xFFCBD5E1)),
+      labelLarge: AppTypography.labelLg.copyWith(color: const Color(0xFFF8FAFC)),
+      labelMedium: AppTypography.labelMd.copyWith(color: const Color(0xFF94A3B8)),
+    ),
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: AppColors.primaryLight,
+      selectionColor: Color(0xFF4338CA),
+      selectionHandleColor: AppColors.primaryLight,
+    ),
+    splashFactory: InkSparkle.splashFactory,
+  );
+}
