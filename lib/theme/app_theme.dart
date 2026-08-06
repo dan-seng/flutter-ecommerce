@@ -1,103 +1,196 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
 
-/// Typographic + theming helpers for the Ember storefront.
-abstract final class AppTheme {
-  static const String serif = 'Fraunces';
-  static const String sans = 'Inter';
+/// Design tokens extracted from the "Kinetic Retail" (Indigo Marketplace)
+/// design system used by the Stitch project.
+abstract class AppColors {
+  static const primary = Color(0xFF4F46E5);
+  static const primaryLight = Color(0xFF6366F1);
+  static const primaryDark = Color(0xFF4338CA);
+  static const onPrimary = Color(0xFFFFFFFF);
+  static const primaryContainer = Color(0xFFEEF2FF);
+  static const onPrimaryContainer = Color(0xFF3730A3);
+  static const inversePrimary = Color(0xFFC7D2FE);
 
-  static TextStyle serifStyle({
-    double size = 20,
-    FontWeight weight = FontWeight.w600,
-    Color color = AppColors.ink,
-    double height = 1.12,
-    double? letterSpacing,
-    FontStyle style = FontStyle.normal,
-  }) =>
-      TextStyle(
-        fontFamily: serif,
-        fontSize: size,
-        fontWeight: weight,
-        color: color,
-        height: height,
-        letterSpacing: letterSpacing,
-        fontStyle: style,
-      );
+  static const secondary = Color(0xFF06B6D4);
+  static const onSecondary = Color(0xFFFFFFFF);
+  static const secondaryContainer = Color(0xFFCFFAFE);
+  static const onSecondaryContainer = Color(0xFF155E75);
 
-  static TextStyle sansStyle({
-    double size = 14,
-    FontWeight weight = FontWeight.w400,
-    Color color = AppColors.ink,
-    double height = 1.4,
-    double? letterSpacing,
-  }) =>
-      TextStyle(
-        fontFamily: sans,
-        fontSize: size,
-        fontWeight: weight,
-        color: color,
-        height: height,
-        letterSpacing: letterSpacing,
-      );
+  static const tertiary = Color(0xFF8B5CF6);
+  static const onTertiary = Color(0xFFFFFFFF);
+  static const tertiaryContainer = Color(0xFFF3E8FF);
+  static const onTertiaryContainer = Color(0xFF6B21A8);
 
-  /// Small-caps eyebrow label used above section titles.
-  static TextStyle eyebrow(Color color) => sansStyle(
-        size: 10.5,
-        weight: FontWeight.w600,
-        color: color,
-        letterSpacing: 2.2,
-      );
+  static const accent = Color(0xFFEC4899);
 
-  static ThemeData get light {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.ember,
-      brightness: Brightness.light,
-      surface: AppColors.surface,
-    );
+  static const error = Color(0xFFEF4444);
+  static const onError = Color(0xFFFFFFFF);
+  static const errorContainer = Color(0xFFFEE2E2);
+  static const onErrorContainer = Color(0xFF991B1B);
 
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      fontFamily: sans,
-      scaffoldBackgroundColor: AppColors.paper,
-      colorScheme: scheme.copyWith(
-        surface: AppColors.surface,
-        onSurface: AppColors.ink,
-        primary: AppColors.ember,
-        onPrimary: Colors.white,
-        outline: AppColors.line,
-      ),
-      splashFactory: InkSparkle.splashFactory,
-      textTheme: Typography.material2021(platform: TargetPlatform.android)
-          .black
-          .apply(fontFamily: sans, bodyColor: AppColors.ink)
-          .copyWith(
-            displayLarge: serifStyle(size: 44, weight: FontWeight.w600, height: 1.04),
-            headlineLarge: serifStyle(size: 34, weight: FontWeight.w600, height: 1.08),
-            headlineMedium: serifStyle(size: 26, weight: FontWeight.w600, height: 1.12),
-            headlineSmall: serifStyle(size: 20, weight: FontWeight.w600, height: 1.15),
-            titleLarge: serifStyle(size: 18, weight: FontWeight.w600, height: 1.2),
-            titleMedium: sansStyle(size: 16, weight: FontWeight.w600),
-            bodyLarge: sansStyle(size: 15),
-            bodyMedium: sansStyle(size: 14),
-            bodySmall: sansStyle(size: 12.5),
-            labelLarge: sansStyle(size: 14.5, weight: FontWeight.w600, letterSpacing: 0.2),
-            labelMedium: sansStyle(size: 12, weight: FontWeight.w600, letterSpacing: 0.4),
-          ),
-      snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.ink,
-        contentTextStyle: sansStyle(size: 14, weight: FontWeight.w500, color: Colors.white),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-      pageTransitionsTheme: const PageTransitionsTheme(
-        builders: {
-          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
-        },
-      ),
-    );
-  }
+  static const background = Color(0xFFF8FAFC);
+  static const onBackground = Color(0xFF0F172A);
+
+  static const surface = Color(0xFFFFFFFF);
+  static const onSurface = Color(0xFF0F172A);
+  static const surfaceVariant = Color(0xFFF1F5F9);
+  static const onSurfaceVariant = Color(0xFF64748B);
+
+  static const outline = Color(0xFF94A3B8);
+  static const outlineVariant = Color(0xFFE2E8F0);
+
+  static const surfaceContainerLowest = Color(0xFFFFFFFF);
+  static const surfaceContainerLow = Color(0xFFF8FAFC);
+  static const surfaceContainer = Color(0xFFF1F5F9);
+  static const surfaceContainerHigh = Color(0xFFE2E8F0);
+  static const surfaceContainerHighest = Color(0xFFCBD5E1);
+
+  static const inverseSurface = Color(0xFF1E293B);
+  static const onInverseSurface = Color(0xFFF8FAFC);
+
+  static const searchField = Color(0xFFF1F5F9);
+  static const chipInactive = Color(0xFFF1F5F9);
+  static const starRating = Color(0xFFF59E0B);
+
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient accentGradient = LinearGradient(
+    colors: [Color(0xFFEC4899), Color(0xFF8B5CF6)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient glassBannerGradient = LinearGradient(
+    colors: [Color(0xCC0F172A), Color(0x330F172A)],
+    begin: Alignment.bottomLeft,
+    end: Alignment.topRight,
+  );
+}
+
+class AppTypography {
+  static const fontFamily = 'Inter';
+
+  static const displayLg = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 32,
+    fontWeight: FontWeight.w700,
+    height: 40 / 32,
+    letterSpacing: -0.02,
+  );
+  static const headlineLg = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 24,
+    fontWeight: FontWeight.w600,
+    height: 32 / 24,
+    letterSpacing: -0.01,
+  );
+  static const headlineMd = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    height: 28 / 20,
+  );
+  static const headlineLgMobile = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 22,
+    fontWeight: FontWeight.w600,
+    height: 28 / 22,
+  );
+  static const titleLg = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    height: 24 / 18,
+  );
+  static const bodyLg = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    height: 24 / 16,
+  );
+  static const bodyMd = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    height: 20 / 14,
+  );
+  static const labelLg = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    height: 20 / 14,
+    letterSpacing: 0.01,
+  );
+  static const labelMd = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    height: 16 / 12,
+  );
+}
+
+ThemeData buildAppTheme() {
+  final colorScheme = ColorScheme.light(
+    primary: AppColors.primary,
+    onPrimary: AppColors.onPrimary,
+    primaryContainer: AppColors.primaryContainer,
+    onPrimaryContainer: AppColors.onPrimaryContainer,
+    inversePrimary: AppColors.inversePrimary,
+    secondary: AppColors.secondary,
+    onSecondary: AppColors.onSecondary,
+    secondaryContainer: AppColors.secondaryContainer,
+    onSecondaryContainer: AppColors.onSecondaryContainer,
+    tertiary: AppColors.tertiary,
+    onTertiary: AppColors.onTertiary,
+    tertiaryContainer: AppColors.tertiaryContainer,
+    onTertiaryContainer: AppColors.onTertiaryContainer,
+    error: AppColors.error,
+    onError: AppColors.onError,
+    errorContainer: AppColors.errorContainer,
+    onErrorContainer: AppColors.onErrorContainer,
+    surface: AppColors.surface,
+    onSurface: AppColors.onSurface,
+    surfaceContainerHighest: AppColors.surfaceVariant,
+    onSurfaceVariant: AppColors.onSurfaceVariant,
+    surfaceContainerLow: AppColors.surfaceContainerLow,
+    surfaceContainer: AppColors.surfaceContainer,
+    surfaceContainerHigh: AppColors.surfaceContainerHigh,
+    surfaceContainerLowest: AppColors.surfaceContainerLowest,
+    outline: AppColors.outline,
+    outlineVariant: AppColors.outlineVariant,
+    inverseSurface: AppColors.inverseSurface,
+    onInverseSurface: AppColors.onInverseSurface,
+    surfaceTint: AppColors.primary,
+  );
+
+  final base = ThemeData(
+    useMaterial3: true,
+    colorScheme: colorScheme,
+    fontFamily: AppTypography.fontFamily,
+  );
+
+  return base.copyWith(
+    scaffoldBackgroundColor: AppColors.background,
+    textTheme: base.textTheme.copyWith(
+      displayLarge: AppTypography.displayLg,
+      headlineLarge: AppTypography.headlineLg,
+      headlineMedium: AppTypography.headlineMd,
+      headlineSmall: AppTypography.headlineLgMobile,
+      titleLarge: AppTypography.titleLg,
+      bodyLarge: AppTypography.bodyLg,
+      bodyMedium: AppTypography.bodyMd,
+      labelLarge: AppTypography.labelLg,
+      labelMedium: AppTypography.labelMd,
+    ),
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: AppColors.primary,
+      selectionColor: AppColors.inversePrimary,
+      selectionHandleColor: AppColors.primary,
+    ),
+    splashFactory: InkSparkle.splashFactory,
+  );
 }

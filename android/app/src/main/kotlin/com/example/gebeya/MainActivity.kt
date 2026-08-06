@@ -1,4 +1,4 @@
-package com.example.dan
+package com.example.gebeya
 
 import io.flutter.embedding.android.FlutterActivity
 
