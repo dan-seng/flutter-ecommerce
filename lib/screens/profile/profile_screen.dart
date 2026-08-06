@@ -236,7 +236,7 @@ class _ProfileCard extends StatelessWidget {
                 width: 76,
                 height: 76,
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  color: Colors.black,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white,
@@ -244,21 +244,16 @@ class _ProfileCard extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.35),
+                      color: Colors.black.withValues(alpha: 0.35),
                       blurRadius: 14,
                       offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                child: const Center(
-                  child: Text(
-                    'A',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(
+                  'assets/images/app_logo_icon.jpg',
+                  fit: BoxFit.cover,
                 ),
               ),
               Positioned(

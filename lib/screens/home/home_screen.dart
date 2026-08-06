@@ -657,25 +657,20 @@ class _HomeHeader extends StatelessWidget {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
+                    color: Colors.black,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
+                        color: Colors.black.withValues(alpha: 0.25),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
                     ],
                   ),
-                  child: const Center(
-                    child: Text(
-                      'A',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 18,
-                      ),
-                    ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset(
+                    'assets/images/app_logo_icon.jpg',
+                    fit: BoxFit.cover,
                   ),
                 ),
                 Positioned(
