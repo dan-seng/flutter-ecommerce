@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -49,9 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final message = _cleanAuthErrorMessage(e);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sign in failed: ${e.toString().replaceAll('Exception:', '')}'),
+            content: Text(message),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -60,6 +62,103 @@ class _LoginScreenState extends State<LoginScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final auth = AuthScope.read(context);
+      await auth.signInWithGoogle();
+      if (mounted && auth.isLoggedIn) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Welcome, ${auth.currentUser?.displayName ?? 'User'}!'),
+            backgroundColor: AppColors.primary,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_cleanAuthErrorMessage(e)),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleFacebookSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final auth = AuthScope.read(context);
+      await auth.signInWithFacebook();
+      if (mounted && auth.isLoggedIn) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Welcome, ${auth.currentUser?.displayName ?? 'User'}!'),
+            backgroundColor: AppColors.primary,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_cleanAuthErrorMessage(e)),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  String _cleanAuthErrorMessage(dynamic error) {
+    debugPrint('Raw Auth Error: $error');
+    if (error is FirebaseAuthException) {
+      switch (error.code) {
+        case 'user-not-found':
+        case 'wrong-password':
+        case 'invalid-credential':
+          return 'Incorrect email or password. Please check your details or create an account.';
+        case 'email-already-in-use':
+          return 'An account already exists with this email address.';
+        case 'invalid-email':
+          return 'Please enter a valid email address.';
+        case 'user-disabled':
+          return 'This user account has been disabled.';
+        case 'too-many-requests':
+          return 'Too many attempts. Please wait a moment and try again.';
+        case 'account-exists-with-different-credential':
+          return 'An account already exists with this email using a different sign-in provider.';
+        default:
+          return error.message ?? 'Sign in failed. Please try again.';
+      }
+    }
+    final str = error.toString().toLowerCase();
+    if (str.contains('canceled') || str.contains('cancelled')) {
+      return 'Sign in was canceled.';
+    }
+    if (str.contains('10') || str.contains('developer_error')) {
+      return 'Google Sign-In requires SHA-1 key added in Firebase Console.';
+    }
+    if (str.contains('invalid-credential') ||
+        str.contains('wrong-password') ||
+        str.contains('user-not-found')) {
+      return 'Incorrect email or password. Please check your details or create an account.';
+    }
+    return 'Social sign in requires Google/Facebook provider enabled in Firebase Console.';
   }
 
   @override
@@ -260,18 +359,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () async {
-                            final auth = AuthScope.read(context);
-                            await auth.signInWithGoogle();
-                            if (context.mounted && auth.isLoggedIn) {
-                              Navigator.of(context).pop();
-                            }
-                          },
+                          onPressed: _isLoading ? null : _handleGoogleSignIn,
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size.fromHeight(48),
                             shape: RoundedRectangleBorder(
@@ -281,11 +373,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: theme.colorScheme.outlineVariant,
                             ),
                           ),
-                          icon: const Icon(
-                            CupertinoIcons.goforward,
-                            size: 18,
-                            color: AppColors.primary,
-                          ),
+                          icon: const _GoogleLogoIcon(),
                           label: Text(
                             'Google',
                             style: AppTypography.labelLg.copyWith(
@@ -299,13 +387,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () async {
-                            final auth = AuthScope.read(context);
-                            await auth.signInWithFacebook();
-                            if (context.mounted && auth.isLoggedIn) {
-                              Navigator.of(context).pop();
-                            }
-                          },
+                          onPressed: _isLoading ? null : _handleFacebookSignIn,
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size.fromHeight(48),
                             side: const BorderSide(
@@ -364,6 +446,32 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GoogleLogoIcon extends StatelessWidget {
+  const _GoogleLogoIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 22,
+      height: 22,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+      ),
+      alignment: Alignment.center,
+      child: const Text(
+        'G',
+        style: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 15,
+          fontWeight: FontWeight.w900,
+          color: Color(0xFF4285F4),
         ),
       ),
     );

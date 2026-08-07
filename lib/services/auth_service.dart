@@ -36,13 +36,14 @@ class AppUser {
 }
 
 class AuthService extends ChangeNotifier {
-  AuthService({FirebaseAuth? firebaseAuth})
-      : _auth = firebaseAuth ?? (_isFirebaseInitialized() ? FirebaseAuth.instance : null) {
+  AuthService({FirebaseAuth? firebaseAuth, AppUser? initialUser})
+      : _currentUser = initialUser,
+        _auth = firebaseAuth ?? (_isFirebaseInitialized() ? FirebaseAuth.instance : null) {
     _init();
   }
 
   final FirebaseAuth? _auth;
-  AppUser? _currentUser = AppUser.mock;
+  AppUser? _currentUser;
   bool _isLoading = false;
 
   AppUser? get currentUser => _currentUser;
@@ -127,6 +128,12 @@ class AuthService extends ChangeNotifier {
     _setLoading(true);
     try {
       if (_auth != null) {
+        try {
+          await GoogleSignIn.instance.initialize(
+            serverClientId:
+                '587970089280-t86mik3e419u8t3k4i3ulrqe54fb99n8.apps.googleusercontent.com',
+          );
+        } catch (_) {}
         final GoogleSignInAccount googleAccount =
             await GoogleSignIn.instance.authenticate();
         final googleAuth = googleAccount.authentication;
@@ -145,6 +152,9 @@ class AuthService extends ChangeNotifier {
           displayName: 'Alex (Google)',
         );
       }
+    } catch (e) {
+      debugPrint('Google Sign-In Error Details: $e');
+      rethrow;
     } finally {
       _setLoading(false);
     }

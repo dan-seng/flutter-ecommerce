@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -52,9 +53,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final message = _cleanRegisterErrorMessage(e);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Registration failed: ${e.toString().replaceAll('Exception:', '')}'),
+            content: Text(message),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -63,6 +65,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  String _cleanRegisterErrorMessage(dynamic error) {
+    if (error is FirebaseAuthException) {
+      switch (error.code) {
+        case 'email-already-in-use':
+          return 'An account already exists with this email address. Please sign in.';
+        case 'weak-password':
+          return 'Password is too weak. Please use at least 6 characters.';
+        case 'invalid-email':
+          return 'Please enter a valid email address.';
+        default:
+          return error.message ?? 'Registration failed. Please try again.';
+      }
+    }
+    final str = error.toString();
+    if (str.contains('email-already-in-use')) {
+      return 'An account already exists with this email address. Please sign in.';
+    }
+    return 'Registration failed. Please check your details and try again.';
   }
 
   @override
