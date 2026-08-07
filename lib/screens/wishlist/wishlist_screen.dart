@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/mock_products.dart';
 import '../../models/cart_item.dart';
 import '../../models/product.dart';
 import '../../state/cart_scope.dart';
@@ -9,29 +8,13 @@ import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../product_detail/product_detail_screen.dart';
 
-class WishlistScreen extends StatefulWidget {
+class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key, this.onExploreTap});
 
   final VoidCallback? onExploreTap;
 
-  @override
-  State<WishlistScreen> createState() => _WishlistScreenState();
-}
-
-class _WishlistScreenState extends State<WishlistScreen> {
-  late List<Product> _wishlistItems;
-
-  @override
-  void initState() {
-    super.initState();
-    // Default sample items in wishlist for rich demonstration
-    _wishlistItems = sampleProducts.take(4).toList();
-  }
-
-  void _removeItem(Product product) {
-    setState(() {
-      _wishlistItems.removeWhere((p) => p.id == product.id);
-    });
+  void _removeItem(BuildContext context, Product product) {
+    CartScope.read(context).removeFavorite(product);
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -43,7 +26,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       );
   }
 
-  void _addToCart(Product product) {
+  void _addToCart(BuildContext context, Product product) {
     CartScope.read(context).add(CartItem(product: product));
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -56,7 +39,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       );
   }
 
-  void _openDetail(Product product) {
+  void _openDetail(BuildContext context, Product product) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ProductDetailScreen(product: product),
@@ -66,27 +49,30 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cart = CartScope.watch(context);
+    final wishlistItems = cart.wishlist;
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            _WishlistHeader(count: _wishlistItems.length),
+            _WishlistHeader(count: wishlistItems.length),
             Expanded(
-              child: _wishlistItems.isEmpty
-                  ? _EmptyWishlist(onExploreTap: widget.onExploreTap)
+              child: wishlistItems.isEmpty
+                  ? _EmptyWishlist(onExploreTap: onExploreTap)
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                      itemCount: _wishlistItems.length,
+                      itemCount: wishlistItems.length,
                       itemBuilder: (context, index) {
-                        final product = _wishlistItems[index];
+                        final product = wishlistItems[index];
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 14),
                           child: _WishlistTile(
                             product: product,
-                            onTap: () => _openDetail(product),
-                            onRemove: () => _removeItem(product),
-                            onAddToCart: () => _addToCart(product),
+                            onTap: () => _openDetail(context, product),
+                            onRemove: () => _removeItem(context, product),
+                            onAddToCart: () => _addToCart(context, product),
                           ),
                         );
                       },

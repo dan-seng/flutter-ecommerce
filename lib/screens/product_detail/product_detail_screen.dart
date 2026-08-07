@@ -29,7 +29,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _selectedColor = 0;
   int _imageIndex = 0;
   String _size = '10.5';
-  bool _isFavorite = true;
 
   static const _colorNames = ['Warm Amber', 'Onyx', 'Pebble Grey'];
   static const _colorValues = [
@@ -197,6 +196,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final product = _product;
+    final isFavorite = CartScope.watch(context).isFavorite(product);
     final images = [product.imageUrl];
 
     return Scaffold(
@@ -503,14 +503,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     const _RoundIconButton(icon: CupertinoIcons.share),
                     const SizedBox(width: 8),
                     _RoundIconButton(
-                      icon: _isFavorite
+                      icon: isFavorite
                           ? CupertinoIcons.heart_fill
                           : CupertinoIcons.heart,
-                      iconColor: _isFavorite ? AppColors.accent : null,
+                      iconColor: isFavorite ? AppColors.accent : null,
                       onTap: () {
-                        setState(() {
-                          _isFavorite = !_isFavorite;
-                        });
+                        CartScope.read(context).toggleFavorite(product);
                       },
                     ),
                   ],
