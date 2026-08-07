@@ -3,10 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/cart_item.dart';
+import '../../state/auth_scope.dart';
 import '../../state/cart.dart';
 import '../../state/cart_scope.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+import '../../widgets/payment_success_dialog.dart';
+import '../../widgets/stripe_payment_sheet.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -380,14 +383,48 @@ class _PromoCodeBadge extends StatelessWidget {
   }
 }
 
-class _CartSummary extends StatelessWidget {
+class _CartSummary extends StatefulWidget {
   const _CartSummary({required this.cart});
 
   final Cart cart;
 
   @override
+  State<_CartSummary> createState() => _CartSummaryState();
+}
+
+class _CartSummaryState extends State<_CartSummary> {
+  Future<void> _processStripeCheckout() async {
+    final auth = AuthScope.read(context);
+    final email = auth.currentUser?.email ?? 'customer@gebeya.com';
+
+    final result = await StripePaymentSheetModal.show(
+      context: context,
+      amount: widget.cart.totalPrice,
+      userEmail: email,
+    );
+
+    if (result == null) return;
+
+    if (result.success) {
+      final txId = result.transactionId ?? 'pi_stripe_approved';
+      final totalPaid = widget.cart.totalPrice;
+      widget.cart.clear();
+
+      if (!mounted) return;
+      PaymentSuccessDialog.show(
+        context: context,
+        amount: totalPaid,
+        transactionId: txId,
+        email: email,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cart = widget.cart;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface.withValues(alpha: 0.85),
@@ -426,7 +463,8 @@ class _CartSummary extends StatelessWidget {
                   const SizedBox(height: 12),
                   Divider(
                     height: 1,
-                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                    color:
+                        theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 12),
                   _SummaryRow(
@@ -453,22 +491,13 @@ class _CartSummary extends StatelessWidget {
                       color: Colors.transparent,
                       borderRadius: BorderRadius.circular(18),
                       child: InkWell(
-                        onTap: () {
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              const SnackBar(
-                                content: Text('Checkout is coming soon'),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                        },
+                        onTap: _processStripeCheckout,
                         borderRadius: BorderRadius.circular(18),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Icon(
-                              CupertinoIcons.lock_fill,
+                              CupertinoIcons.creditcard_fill,
                               size: 18,
                               color: Colors.white,
                             ),
