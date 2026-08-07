@@ -4,6 +4,7 @@ import '../../data/mock_products.dart';
 import '../../models/cart_item.dart';
 import '../../models/product.dart';
 import '../../services/fakestore_api.dart';
+import '../../state/auth_scope.dart';
 import '../../state/cart_scope.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/indigo_bottom_nav_bar.dart';
@@ -553,19 +554,19 @@ class _HomeHeader extends StatelessWidget {
   }
 
   void _openProfileSwitcher(BuildContext context) {
+    final auth = AuthScope.read(context);
+    final user = auth.currentUser;
+    final userName = user?.displayName ?? user?.email ?? 'Logged User';
+    final userEmail = user?.email ?? '';
+
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            border: Border.all(
-              color: AppColors.outlineVariant.withValues(alpha: 0.4),
-            ),
-          ),
+        return Padding(
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -582,7 +583,7 @@ class _HomeHeader extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Switch Profile Account',
+                'Active Account Profile',
                 style: AppTypography.titleLg.copyWith(
                   fontWeight: FontWeight.w700,
                   color: AppColors.onSurface,
@@ -590,16 +591,9 @@ class _HomeHeader extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _AccountTile(
-                name: 'Alex (Personal)',
-                email: 'alex.j@example.com',
+                name: userName,
+                email: userEmail,
                 isSelected: true,
-                onTap: () => Navigator.pop(context),
-              ),
-              const SizedBox(height: 8),
-              _AccountTile(
-                name: 'Alex (Business)',
-                email: 'alex.biz@company.com',
-                isSelected: false,
                 onTap: () => Navigator.pop(context),
               ),
               const SizedBox(height: 16),
@@ -611,7 +605,8 @@ class _HomeHeader extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.of(context).push(
                       MaterialPageRoute<void>(
-                          builder: (_) => const ProfileScreen()),
+                        builder: (_) => const ProfileScreen(),
+                      ),
                     );
                   },
                   style: OutlinedButton.styleFrom(
@@ -636,6 +631,16 @@ class _HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cart = CartScope.watch(context);
+    final auth = AuthScope.watch(context);
+    final user = auth.currentUser;
+    final rawName = user?.displayName;
+    final rawEmail = user?.email;
+    final displayName = (rawName != null && rawName.trim().isNotEmpty)
+        ? rawName.trim().split(' ').first
+        : ((rawEmail != null && rawEmail.contains('@'))
+            ? rawEmail.split('@').first
+            : 'Valued Customer');
+    final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -668,10 +673,10 @@ class _HomeHeader extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      'A',
-                      style: TextStyle(
+                      initial,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
                         fontSize: 17,
@@ -736,7 +741,7 @@ class _HomeHeader extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          'Alex',
+                          displayName,
                           style: AppTypography.titleLg.copyWith(
                             color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.w700,

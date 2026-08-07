@@ -28,7 +28,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  static const _popularSearches = [
+  final List<String> _popularSearches = [
     'Backpack',
     'Watch',
     'Sneakers',
@@ -48,7 +48,7 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     _repository = widget.repository ?? FakeStoreApi();
     _controller = TextEditingController(text: widget.initialQuery);
-    _query = widget.initialQuery.trim();
+    _query = widget.initialQuery;
     _productsFuture = _repository.fetchProducts();
   }
 
@@ -59,12 +59,27 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _onQueryChanged(String value) {
-    setState(() => _query = value.trim());
+    setState(() => _query = value);
   }
 
   void _setQuery(String query) {
     _controller.text = query;
+    _controller.selection = TextSelection.fromPosition(
+      TextPosition(offset: query.length),
+    );
     _onQueryChanged(query);
+  }
+
+  void _removePopularSearch(String term) {
+    setState(() {
+      _popularSearches.removeWhere((t) => t.toLowerCase() == term.toLowerCase());
+    });
+  }
+
+  void _clearAllPopularSearches() {
+    setState(() {
+      _popularSearches.clear();
+    });
   }
 
   void _retry() {
@@ -131,6 +146,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     products: products,
                     popularSearches: _popularSearches,
                     onSuggestionTap: _setQuery,
+                    onRemoveSuggestion: _removePopularSearch,
+                    onClearAllSuggestions: _clearAllPopularSearches,
                     onProductTap: _openProduct,
                     onAddProduct: _addToCart,
                   );
@@ -271,6 +288,8 @@ class _SearchBody extends StatelessWidget {
     required this.products,
     required this.popularSearches,
     required this.onSuggestionTap,
+    required this.onRemoveSuggestion,
+    required this.onClearAllSuggestions,
     required this.onProductTap,
     required this.onAddProduct,
   });
@@ -279,6 +298,8 @@ class _SearchBody extends StatelessWidget {
   final List<Product> products;
   final List<String> popularSearches;
   final ValueChanged<String> onSuggestionTap;
+  final ValueChanged<String> onRemoveSuggestion;
+  final VoidCallback onClearAllSuggestions;
   final ValueChanged<Product> onProductTap;
   final ValueChanged<Product> onAddProduct;
 
@@ -289,18 +310,20 @@ class _SearchBody extends StatelessWidget {
         popularSearches: popularSearches,
         products: products,
         onSuggestionTap: onSuggestionTap,
+        onRemoveSuggestion: onRemoveSuggestion,
+        onClearAllSuggestions: onClearAllSuggestions,
         onProductTap: onProductTap,
         onAddProduct: onAddProduct,
       );
     }
 
-    final q = query.toLowerCase();
+    final tokens =
+        query.toLowerCase().split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
     final results = products.where((p) {
-      final nameMatch = p.name.toLowerCase().contains(q);
-      final categoryMatch = p.category.toLowerCase().contains(q);
-      final descMatch = p.description.toLowerCase().contains(q);
-      final priceMatch = formatMoney(p.price).toLowerCase().contains(q);
-      return nameMatch || categoryMatch || descMatch || priceMatch;
+      final searchableText =
+          '${p.name} ${p.category} ${p.description} \$${p.price} ${formatMoney(p.price)}'
+              .toLowerCase();
+      return tokens.every((token) => searchableText.contains(token));
     }).toList();
 
     if (results.isEmpty) {
@@ -347,6 +370,8 @@ class _SearchSuggestions extends StatelessWidget {
     required this.popularSearches,
     required this.products,
     required this.onSuggestionTap,
+    required this.onRemoveSuggestion,
+    required this.onClearAllSuggestions,
     required this.onProductTap,
     required this.onAddProduct,
   });
@@ -354,6 +379,8 @@ class _SearchSuggestions extends StatelessWidget {
   final List<String> popularSearches;
   final List<Product> products;
   final ValueChanged<String> onSuggestionTap;
+  final ValueChanged<String> onRemoveSuggestion;
+  final VoidCallback onClearAllSuggestions;
   final ValueChanged<Product> onProductTap;
   final ValueChanged<Product> onAddProduct;
 
@@ -363,24 +390,36 @@ class _SearchSuggestions extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
-        Text(
-          'Popular Searches',
-          style: AppTypography.headlineMd.copyWith(
-            color: theme.colorScheme.onSurface,
-            fontWeight: FontWeight.w800,
+        if (popularSearches.isNotEmpty) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Popular Searches',
+                style: AppTypography.headlineMd.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              TextButton(
+                onPressed: onClearAllSuggestions,
+                child: Text(
+                  'Clear All',
+                  style: AppTypography.labelMd.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(height: 14),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: popularSearches.map((term) {
-            return GestureDetector(
-              onTap: () => onSuggestionTap(term),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: popularSearches.map((term) {
+              return Container(
+                padding: const EdgeInsets.fromLTRB(12, 6, 8, 6),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
@@ -398,25 +437,46 @@ class _SearchSuggestions extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      CupertinoIcons.search,
-                      size: 14,
-                      color: AppColors.primary,
+                    GestureDetector(
+                      onTap: () => onSuggestionTap(term),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.search,
+                            size: 14,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            term,
+                            style: AppTypography.labelLg.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      term,
-                      style: AppTypography.labelLg.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
+                    const SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: () => onRemoveSuggestion(term),
+                      child: Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: Icon(
+                          CupertinoIcons.xmark_circle_fill,
+                          size: 16,
+                          color: theme.colorScheme.onSurfaceVariant
+                              .withValues(alpha: 0.5),
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            );
-          }).toList(),
-        ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+        ],
         const SizedBox(height: 28),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
