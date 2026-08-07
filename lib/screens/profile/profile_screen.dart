@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../state/auth_scope.dart';
 import '../../state/theme_scope.dart';
 import '../../theme/app_theme.dart';
+import '../auth/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -211,6 +213,12 @@ class _ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final auth = AuthScope.watch(context);
+    final user = auth.currentUser;
+    final name = user?.displayName ?? 'Alex Johnson';
+    final email = user?.email ?? 'alex.johnson@example.com';
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'A';
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -255,10 +263,10 @@ class _ProfileCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'A',
-                    style: TextStyle(
+                    initial,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.w800,
@@ -273,7 +281,7 @@ class _ProfileCard extends StatelessWidget {
                   width: 18,
                   height: 18,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981),
+                    color: auth.isLoggedIn ? const Color(0xFF10B981) : AppColors.outline,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2.5),
                   ),
@@ -290,7 +298,7 @@ class _ProfileCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        'Alex Johnson',
+                        name,
                         style: AppTypography.headlineMd.copyWith(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w800,
@@ -308,7 +316,7 @@ class _ProfileCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'alex.johnson@example.com',
+                  email,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.bodyMd.copyWith(
@@ -731,12 +739,19 @@ class _SignOutButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = AuthScope.watch(context);
+    final isLoggedIn = auth.isLoggedIn;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.errorContainer.withValues(alpha: 0.4),
+        color: isLoggedIn
+            ? AppColors.errorContainer.withValues(alpha: 0.4)
+            : AppColors.primaryContainer.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.accent.withValues(alpha: 0.25),
+          color: isLoggedIn
+              ? AppColors.accent.withValues(alpha: 0.25)
+              : AppColors.primary.withValues(alpha: 0.25),
         ),
       ),
       child: Material(
@@ -744,31 +759,48 @@ class _SignOutButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                const SnackBar(
-                  content: Text('Signed out (demo)'),
-                  behavior: SnackBarBehavior.floating,
+          onTap: () async {
+            if (isLoggedIn) {
+              await AuthScope.read(context).signOut();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(
+                      content: Text('Signed out (demo)'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+              }
+            } else {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const LoginScreen(),
                 ),
               );
+            }
           },
           child: SizedBox(
             height: 52,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  CupertinoIcons.square_arrow_right,
+                Icon(
+                  isLoggedIn
+                      ? CupertinoIcons.square_arrow_right
+                      : CupertinoIcons.person_crop_circle_badge_plus,
                   size: 20,
-                  color: AppColors.onErrorContainer,
+                  color: isLoggedIn
+                      ? AppColors.onErrorContainer
+                      : AppColors.primary,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Sign Out',
+                  isLoggedIn ? 'Sign Out' : 'Sign In / Register',
                   style: AppTypography.titleLg.copyWith(
-                    color: AppColors.onErrorContainer,
+                    color: isLoggedIn
+                        ? AppColors.onErrorContainer
+                        : AppColors.primary,
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
                   ),
