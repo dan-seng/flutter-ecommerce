@@ -8,6 +8,9 @@ import 'package:gebeya/screens/cart/cart_screen.dart';
 import 'package:gebeya/screens/product_detail/product_detail_screen.dart';
 import 'package:gebeya/services/fakestore_api.dart';
 
+import 'package:gebeya/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class _FakeRepository implements ProductRepository {
   _FakeRepository(this.products);
 
@@ -22,12 +25,18 @@ class _FakeRepository implements ProductRepository {
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({'hasSeenOnboarding': true});
+  });
+
   Future<void> pumpApp(WidgetTester tester) async {
     await tester.pumpWidget(
-      GebeyaApp(repository: _FakeRepository(sampleProducts)),
+      GebeyaApp(
+        repository: _FakeRepository(sampleProducts),
+        initialUser: AppUser.mock,
+      ),
     );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
   }
 
   testWidgets('Home screen renders products from the API', (tester) async {

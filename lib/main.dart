@@ -1,7 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'screens/auth/login_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/onboarding/onboarding_screen.dart';
 import 'services/auth_service.dart';
 import 'services/fakestore_api.dart';
 import 'state/auth_scope.dart';
@@ -21,9 +24,10 @@ Future<void> main() async {
 }
 
 class GebeyaApp extends StatefulWidget {
-  const GebeyaApp({super.key, this.repository});
+  const GebeyaApp({super.key, this.repository, this.initialUser});
 
   final ProductRepository? repository;
+  final AppUser? initialUser;
 
   @override
   State<GebeyaApp> createState() => _GebeyaAppState();
@@ -31,7 +35,7 @@ class GebeyaApp extends StatefulWidget {
 
 class _GebeyaAppState extends State<GebeyaApp> {
   final Cart _cart = Cart();
-  late final AuthService _authService = AuthService();
+  late final AuthService _authService = AuthService(initialUser: widget.initialUser);
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +53,60 @@ class _GebeyaAppState extends State<GebeyaApp> {
                 theme: buildAppTheme(),
                 darkTheme: buildAppDarkTheme(),
                 themeMode: themeController.themeMode,
-                home: HomeScreen(repository: widget.repository),
+                home: AppFlowGate(repository: widget.repository),
               );
             },
           ),
         ),
       ),
     );
+  }
+}
+
+class AppFlowGate extends StatefulWidget {
+  const AppFlowGate({super.key, this.repository});
+
+  final ProductRepository? repository;
+
+  @override
+  State<AppFlowGate> createState() => _AppFlowGateState();
+}
+
+class _AppFlowGateState extends State<AppFlowGate> {
+  bool? _hasSeenOnboarding;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboarding();
+  }
+
+  Future<void> _checkOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_hasSeenOnboarding == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (!_hasSeenOnboarding!) {
+      return const OnboardingScreen();
+    }
+
+    final auth = AuthScope.watch(context);
+    if (!auth.isLoggedIn) {
+      return const LoginScreen();
+    }
+
+    return HomeScreen(repository: widget.repository);
   }
 }
