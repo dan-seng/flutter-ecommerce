@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AppUser {
   const AppUser({
@@ -80,7 +82,6 @@ class AuthService extends ChangeNotifier {
           _currentUser = AppUser.fromFirebase(credential.user!);
         }
       } else {
-        // Fallback simulation for local dev
         await Future<void>.delayed(const Duration(milliseconds: 600));
         _currentUser = AppUser(
           uid: 'user_${email.hashCode}',
@@ -122,6 +123,62 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<void> signInWithGoogle() async {
+    _setLoading(true);
+    try {
+      if (_auth != null) {
+        final GoogleSignInAccount googleAccount =
+            await GoogleSignIn.instance.authenticate();
+        final googleAuth = googleAccount.authentication;
+        final OAuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+        );
+        final userCredential = await _auth.signInWithCredential(credential);
+        if (userCredential.user != null) {
+          _currentUser = AppUser.fromFirebase(userCredential.user!);
+        }
+      } else {
+        await Future<void>.delayed(const Duration(milliseconds: 600));
+        _currentUser = const AppUser(
+          uid: 'google_user_999',
+          email: 'alex.google@example.com',
+          displayName: 'Alex (Google)',
+        );
+      }
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> signInWithFacebook() async {
+    _setLoading(true);
+    try {
+      if (_auth != null) {
+        final LoginResult result = await FacebookAuth.instance.login(
+          permissions: ['email', 'public_profile'],
+        );
+        if (result.status == LoginStatus.success) {
+          final OAuthCredential credential = FacebookAuthProvider.credential(
+            result.accessToken!.tokenString,
+          );
+          final userCredential = await _auth.signInWithCredential(credential);
+          if (userCredential.user != null) {
+            _currentUser = AppUser.fromFirebase(userCredential.user!);
+          }
+        }
+      } else {
+        await Future<void>.delayed(const Duration(milliseconds: 600));
+        _currentUser = const AppUser(
+          uid: 'fb_user_888',
+          email: 'alex.facebook@example.com',
+          displayName: 'Alex (Facebook)',
+        );
+      }
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   Future<void> sendPasswordReset(String email) async {
     if (_auth != null) {
       await _auth.sendPasswordResetEmail(email: email.trim());
@@ -135,6 +192,8 @@ class AuthService extends ChangeNotifier {
     try {
       if (_auth != null) {
         await _auth.signOut();
+        await GoogleSignIn.instance.signOut();
+        await FacebookAuth.instance.logOut();
       }
       _currentUser = null;
     } finally {

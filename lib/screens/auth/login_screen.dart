@@ -234,6 +234,104 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          color: theme.colorScheme.outlineVariant,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'OR CONTINUE WITH',
+                          style: AppTypography.labelMd.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          color: theme.colorScheme.outlineVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            final auth = AuthScope.read(context);
+                            await auth.signInWithGoogle();
+                            if (context.mounted && auth.isLoggedIn) {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            side: BorderSide(
+                              color: theme.colorScheme.outlineVariant,
+                            ),
+                          ),
+                          icon: const Icon(
+                            CupertinoIcons.goforward,
+                            size: 18,
+                            color: AppColors.primary,
+                          ),
+                          label: Text(
+                            'Google',
+                            style: AppTypography.labelLg.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            final auth = AuthScope.read(context);
+                            await auth.signInWithFacebook();
+                            if (context.mounted && auth.isLoggedIn) {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(48),
+                            side: const BorderSide(
+                              color: Color(0xFF1877F2),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          icon: const Icon(
+                            Icons.facebook,
+                            size: 20,
+                            color: Color(0xFF1877F2),
+                          ),
+                          label: Text(
+                            'Facebook',
+                            style: AppTypography.labelLg.copyWith(
+                              color: const Color(0xFF1877F2),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
