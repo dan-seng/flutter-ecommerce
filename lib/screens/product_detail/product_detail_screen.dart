@@ -31,9 +31,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   String _size = '10.5';
   bool _isFavorite = true;
 
-  static const _colorNames = ['Midnight Indigo', 'Onyx', 'Pebble Grey'];
+  static const _colorNames = ['Warm Amber', 'Onyx', 'Pebble Grey'];
   static const _colorValues = [
-    Color(0xFF4F46E5),
+    Color(0xFFD97706),
     Color(0xFF0F172A),
     Color(0xFFCBD5E1),
   ];
