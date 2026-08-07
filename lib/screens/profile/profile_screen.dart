@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../state/auth_scope.dart';
+import '../../state/cart_scope.dart';
 import '../../state/theme_scope.dart';
 import '../../theme/app_theme.dart';
 import '../auth/login_screen.dart';
@@ -16,19 +17,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _notificationsEnabled = true;
 
-  static const _stats = [
-    (value: '12', label: 'Orders', icon: CupertinoIcons.cube_box_fill),
-    (value: '8', label: 'Wishlist', icon: CupertinoIcons.heart_fill),
-    (value: '4', label: 'Reviews', icon: CupertinoIcons.star_fill),
-  ];
-
-  static const _accountItems = [
-    (icon: CupertinoIcons.tickets, label: 'My Orders', badge: '12'),
-    (icon: CupertinoIcons.heart, label: 'My Wishlist', badge: '8'),
-    (icon: CupertinoIcons.location, label: 'Shipping Address', badge: '2 saved'),
-    (icon: CupertinoIcons.creditcard, label: 'Payment Methods', badge: 'Visa ••• 4242'),
-  ];
-
   static const _generalItems = [
     (icon: CupertinoIcons.gear, label: 'Settings', badge: null),
     (icon: CupertinoIcons.bell, label: 'Notifications', badge: 'On'),
@@ -37,6 +25,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cart = CartScope.watch(context);
+    final wishlistCount = cart.wishlist.length.toString();
+    final cartCount = cart.items.length.toString();
+
+    final dynamicStats = [
+      (value: cartCount, label: 'Cart Items', icon: CupertinoIcons.bag_fill),
+      (value: wishlistCount, label: 'Wishlist', icon: CupertinoIcons.heart_fill),
+      (value: '4', label: 'Reviews', icon: CupertinoIcons.star_fill),
+    ];
+
+    final dynamicAccountItems = [
+      (icon: CupertinoIcons.tickets, label: 'My Orders', badge: '$cartCount items'),
+      (icon: CupertinoIcons.heart, label: 'My Wishlist', badge: '$wishlistCount saved'),
+      (icon: CupertinoIcons.location, label: 'Shipping Address', badge: '2 saved'),
+      (icon: CupertinoIcons.creditcard, label: 'Payment Methods', badge: 'Visa ••• 4242'),
+    ];
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -49,11 +54,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   const _ProfileCard(),
                   const SizedBox(height: 16),
-                  const _StatsRow(stats: _stats),
+                  _StatsRow(stats: dynamicStats),
                   const SizedBox(height: 20),
                   const _QuickShortcutsGrid(),
                   const SizedBox(height: 24),
-                  _MenuSection(title: 'Account', items: _accountItems),
+                  _MenuSection(title: 'Account', items: dynamicAccountItems),
                   const SizedBox(height: 20),
                   Builder(
                     builder: (context) {
@@ -215,9 +220,16 @@ class _ProfileCard extends StatelessWidget {
     final theme = Theme.of(context);
     final auth = AuthScope.watch(context);
     final user = auth.currentUser;
-    final name = user?.displayName ?? 'Alex Johnson';
-    final email = user?.email ?? 'alex.johnson@example.com';
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'A';
+    final rawName = user?.displayName;
+    final displayName = (rawName != null && rawName.trim().isNotEmpty) ? rawName.trim() : null;
+    final userEmail = user?.email;
+    final name = (displayName != null && displayName.isNotEmpty)
+        ? displayName
+        : (userEmail != null && userEmail.contains('@')
+            ? userEmail.split('@').first
+            : 'Valued Customer');
+    final email = userEmail ?? 'Not signed in';
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'U';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -322,44 +334,6 @@ class _ProfileCard extends StatelessWidget {
                   style: AppTypography.bodyMd.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        CupertinoIcons.star_fill,
-                        size: 11,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'VIP GOLD MEMBER',
-                        style: AppTypography.labelMd.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 10,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],
