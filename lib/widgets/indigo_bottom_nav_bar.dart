@@ -48,6 +48,15 @@ class IndigoBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final navBgColor = isDark
+        ? const Color(0xFF0F172A).withValues(alpha: 0.88)
+        : Colors.white.withValues(alpha: 0.72);
+    final navBorderColor = isDark
+        ? const Color(0xFF334155).withValues(alpha: 0.8)
+        : Colors.white.withValues(alpha: 0.8);
+
     return SafeArea(
       top: false,
       child: Container(
@@ -57,7 +66,7 @@ class IndigoBottomNavBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
               blurRadius: 24,
               spreadRadius: 0,
               offset: const Offset(0, 8),
@@ -75,10 +84,10 @@ class IndigoBottomNavBar extends StatelessWidget {
             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.72),
+                color: navBgColor,
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: navBorderColor,
                   width: 1.2,
                 ),
               ),
@@ -100,12 +109,12 @@ class IndigoBottomNavBar extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: active
-                                ? AppColors.primary.withValues(alpha: 0.12)
+                                ? AppColors.primary.withValues(alpha: 0.16)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(18),
                             border: active
                                 ? Border.all(
-                                    color: AppColors.primary.withValues(alpha: 0.2),
+                                    color: AppColors.primary.withValues(alpha: 0.3),
                                     width: 1,
                                   )
                                 : null,
@@ -128,8 +137,8 @@ class IndigoBottomNavBar extends StatelessWidget {
                                         key: ValueKey<bool>(active),
                                         size: 22,
                                         color: active
-                                            ? AppColors.primary
-                                            : AppColors.onSurfaceVariant
+                                            ? (isDark ? AppColors.primaryLight : AppColors.primary)
+                                            : theme.colorScheme.onSurfaceVariant
                                                 .withValues(alpha: 0.7),
                                       ),
                                     ),
@@ -150,8 +159,8 @@ class IndigoBottomNavBar extends StatelessWidget {
                                   fontWeight:
                                       active ? FontWeight.w700 : FontWeight.w500,
                                   color: active
-                                      ? AppColors.primary
-                                      : AppColors.onSurfaceVariant
+                                      ? (isDark ? AppColors.primaryLight : AppColors.primary)
+                                      : theme.colorScheme.onSurfaceVariant
                                           .withValues(alpha: 0.7),
                                 ),
                                 child: Text(item.label),
@@ -179,6 +188,7 @@ class _CartBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
@@ -193,7 +203,10 @@ class _CartBadge extends StatelessWidget {
             offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(color: Colors.white, width: 1.5),
+        border: Border.all(
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+          width: 1.5,
+        ),
       ),
       child: Text(
         '$count',

@@ -16,7 +16,6 @@ class CartScreen extends StatelessWidget {
     final cart = CartScope.watch(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -55,42 +54,47 @@ class _CartHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final canPop = Navigator.of(context).canPop();
+
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.8),
+        color: theme.colorScheme.surface.withValues(alpha: 0.85),
         border: Border(
           bottom: BorderSide(
-            color: AppColors.outlineVariant.withValues(alpha: 0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
       child: Row(
         children: [
-          Material(
-            color: Colors.transparent,
-            shape: const CircleBorder(),
-            child: InkWell(
-              onTap: () => Navigator.of(context).pop(),
-              customBorder: const CircleBorder(),
-              child: const SizedBox(
-                width: 40,
-                height: 40,
-                child: Icon(
-                  CupertinoIcons.chevron_back,
-                  color: AppColors.onSurface,
-                  size: 22,
+          if (canPop) ...[
+            Material(
+              color: Colors.transparent,
+              shape: const CircleBorder(),
+              child: InkWell(
+                onTap: () => Navigator.of(context).pop(),
+                customBorder: const CircleBorder(),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(
+                    CupertinoIcons.chevron_back,
+                    color: theme.colorScheme.onSurface,
+                    size: 22,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 4),
+            const SizedBox(width: 4),
+          ],
           Expanded(
             child: Text(
               'My Cart',
               style: AppTypography.headlineMd.copyWith(
-                color: AppColors.onBackground,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
                 fontSize: 20,
               ),
@@ -134,6 +138,7 @@ class _CartItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final product = item.product;
     final options = [
       if (item.size != null) 'US ${item.size}',
@@ -143,10 +148,10 @@ class _CartItemTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.5),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
@@ -162,99 +167,82 @@ class _CartItemTile extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: SizedBox(
-              width: 86,
-              height: 86,
+              width: 84,
+              height: 84,
               child: Image.network(
                 product.imageUrl,
                 fit: BoxFit.cover,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return const ColoredBox(
-                    color: AppColors.surfaceContainerHigh,
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) => const ColoredBox(
-                  color: AppColors.surfaceContainerHigh,
+                errorBuilder: (context, error, stackTrace) => ColoredBox(
+                  color: theme.colorScheme.surfaceContainerHigh,
                   child: Center(
                     child: Icon(
                       CupertinoIcons.photo,
-                      color: AppColors.onSurfaceVariant,
+                      size: 24,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
                         product.name,
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTypography.labelLg.copyWith(
-                          color: AppColors.onSurface,
+                        style: AppTypography.titleLg.copyWith(
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w700,
-                          fontSize: 14,
+                          fontSize: 15,
                         ),
                       ),
                     ),
-                    _RemoveButton(
-                      onTap: () => CartScope.read(context).remove(item),
+                    GestureDetector(
+                      onTap: () {
+                        CartScope.read(context).remove(item);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Icon(
+                          Icons.delete_outline,
+                          size: 18,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                if (options.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      options,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.bodyMd.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  )
-                else
+                if (options.isNotEmpty) ...[
+                  const SizedBox(height: 2),
                   Text(
-                    product.category.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    options,
                     style: AppTypography.bodyMd.copyWith(
-                      color: AppColors.primary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontSize: 12,
                     ),
                   ),
+                ],
                 const SizedBox(height: 10),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Text(
-                        formatMoney(item.lineTotal),
-                        style: AppTypography.titleLg.copyWith(
-                          color: AppColors.onBackground,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                        ),
+                    Text(
+                      formatMoney(product.price * item.quantity),
+                      style: AppTypography.titleLg.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
                       ),
                     ),
-                    _CompactQuantityControl(item: item),
+                    _QuantitySelector(item: item),
                   ],
                 ),
               ],
@@ -266,73 +254,44 @@ class _CartItemTile extends StatelessWidget {
   }
 }
 
-class _RemoveButton extends StatelessWidget {
-  const _RemoveButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      shape: const CircleBorder(),
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: const Padding(
-          padding: EdgeInsets.all(4),
-          child: Icon(
-            Icons.delete_outline,
-            color: AppColors.outline,
-            size: 20,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CompactQuantityControl extends StatelessWidget {
-  const _CompactQuantityControl({required this.item});
+class _QuantitySelector extends StatelessWidget {
+  const _QuantitySelector({required this.item});
 
   final CartItem item;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cart = CartScope.read(context);
+
     return Container(
-      height: 34,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _MiniQuantityButton(
+          _StepButton(
             icon: Icons.remove,
-            onTap: () => CartScope.read(context)
-                .setQuantity(item, item.quantity - 1),
+            onTap: () => cart.setQuantity(item, item.quantity - 1),
           ),
-          SizedBox(
-            width: 22,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Text(
               '${item.quantity}',
-              textAlign: TextAlign.center,
               style: AppTypography.labelLg.copyWith(
-                color: AppColors.onSurface,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
-          _MiniQuantityButton(
+          _StepButton(
             icon: Icons.add,
-            onTap: () => CartScope.read(context)
-                .setQuantity(item, item.quantity + 1),
+            onTap: () => cart.setQuantity(item, item.quantity + 1),
           ),
         ],
       ),
@@ -340,24 +299,28 @@ class _CompactQuantityControl extends StatelessWidget {
   }
 }
 
-class _MiniQuantityButton extends StatelessWidget {
-  const _MiniQuantityButton({required this.icon, required this.onTap});
+class _StepButton extends StatelessWidget {
+  const _StepButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(8),
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         child: SizedBox(
-          width: 26,
-          height: 26,
-          child: Icon(icon, size: 16, color: AppColors.primary),
+          width: 32,
+          height: 32,
+          child: Icon(
+            icon,
+            size: 16,
+            color: theme.colorScheme.onSurface,
+          ),
         ),
       ),
     );
@@ -369,13 +332,14 @@ class _PromoCodeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.primaryContainer.withValues(alpha: 0.3),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
@@ -385,14 +349,13 @@ class _PromoCodeBadge extends StatelessWidget {
             color: AppColors.primary,
             size: 20,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Promo Code: GEBEYA10 Applied',
+              'Promo Code Applied',
               style: AppTypography.labelLg.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -424,13 +387,14 @@ class _CartSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
+        color: theme.colorScheme.surface.withValues(alpha: 0.85),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         border: Border(
           top: BorderSide(
-            color: Colors.white.withValues(alpha: 0.9),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             width: 1,
           ),
         ),
@@ -462,7 +426,7 @@ class _CartSummary extends StatelessWidget {
                   const SizedBox(height: 12),
                   Divider(
                     height: 1,
-                    color: AppColors.outlineVariant.withValues(alpha: 0.4),
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 12),
                   _SummaryRow(
@@ -545,6 +509,7 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -553,8 +518,8 @@ class _SummaryRow extends StatelessWidget {
           style: (emphasized ? AppTypography.titleLg : AppTypography.bodyMd)
               .copyWith(
             color: emphasized
-                ? AppColors.onSurface
-                : AppColors.onSurfaceVariant,
+                ? theme.colorScheme.onSurface
+                : theme.colorScheme.onSurfaceVariant,
             fontWeight: emphasized ? FontWeight.w800 : FontWeight.w500,
           ),
         ),
@@ -566,7 +531,7 @@ class _SummaryRow extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 )
               : AppTypography.bodyMd.copyWith(
-                  color: AppColors.onSurface,
+                  color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w700,
                 ),
         ),
@@ -580,6 +545,7 @@ class _EmptyCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -606,7 +572,7 @@ class _EmptyCart extends StatelessWidget {
             Text(
               'Your cart is empty',
               style: AppTypography.headlineMd.copyWith(
-                color: AppColors.onBackground,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -615,7 +581,7 @@ class _EmptyCart extends StatelessWidget {
               'Browse our latest drops and add something you love.',
               textAlign: TextAlign.center,
               style: AppTypography.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 28),
@@ -633,7 +599,11 @@ class _EmptyCart extends StatelessWidget {
                 ],
               ),
               child: ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,

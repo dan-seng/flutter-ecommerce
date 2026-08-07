@@ -67,7 +67,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -107,14 +106,15 @@ class _WishlistHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
+        color: theme.colorScheme.surface.withValues(alpha: 0.85),
         border: Border(
           bottom: BorderSide(
-            color: AppColors.outlineVariant.withValues(alpha: 0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -123,7 +123,7 @@ class _WishlistHeader extends StatelessWidget {
           Text(
             'My Wishlist',
             style: AppTypography.headlineMd.copyWith(
-              color: AppColors.onBackground,
+              color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w800,
               fontSize: 20,
             ),
@@ -165,12 +165,13 @@ class _WishlistTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
         boxShadow: [
           BoxShadow(
@@ -194,17 +195,17 @@ class _WishlistTile extends StatelessWidget {
                   child: Container(
                     width: 90,
                     height: 90,
-                    color: AppColors.surfaceContainerLow,
+                    color: theme.colorScheme.surfaceContainerLow,
                     child: Image.network(
                       product.imageUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
-                          const ColoredBox(
-                        color: AppColors.surfaceContainerLow,
+                          ColoredBox(
+                        color: theme.colorScheme.surfaceContainerLow,
                         child: Center(
                           child: Icon(
                             CupertinoIcons.photo,
-                            color: AppColors.onSurfaceVariant,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -252,7 +253,7 @@ class _WishlistTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.titleLg.copyWith(
-                          color: AppColors.onBackground,
+                          color: theme.colorScheme.onSurface,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                         ),
@@ -332,6 +333,7 @@ class _EmptyWishlist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -355,7 +357,7 @@ class _EmptyWishlist extends StatelessWidget {
             Text(
               'Your Wishlist is Empty',
               style: AppTypography.headlineMd.copyWith(
-                color: AppColors.onBackground,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
                 fontSize: 20,
               ),
@@ -365,7 +367,7 @@ class _EmptyWishlist extends StatelessWidget {
               'Save your favorite items here to shop them later anytime.',
               textAlign: TextAlign.center,
               style: AppTypography.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 13,
               ),
             ),

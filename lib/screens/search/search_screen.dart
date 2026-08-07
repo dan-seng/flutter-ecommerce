@@ -100,7 +100,6 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -162,6 +161,7 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final canPop = Navigator.of(context).canPop();
     final showBack = canPop || onBackTap != null;
 
@@ -169,10 +169,10 @@ class _SearchField extends StatelessWidget {
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.8),
+        color: theme.colorScheme.surface.withValues(alpha: 0.85),
         border: Border(
           bottom: BorderSide(
-            color: AppColors.outlineVariant.withValues(alpha: 0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -191,12 +191,12 @@ class _SearchField extends StatelessWidget {
                   }
                 },
                 customBorder: const CircleBorder(),
-                child: const SizedBox(
+                child: SizedBox(
                   width: 40,
                   height: 40,
                   child: Icon(
                     CupertinoIcons.chevron_back,
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                     size: 22,
                   ),
                 ),
@@ -209,10 +209,10 @@ class _SearchField extends StatelessWidget {
               height: 44,
               padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
-                color: AppColors.searchField,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: AppColors.outlineVariant.withValues(alpha: 0.4),
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                 ),
               ),
               child: Row(
@@ -231,14 +231,14 @@ class _SearchField extends StatelessWidget {
                       cursorColor: AppColors.primary,
                       textInputAction: TextInputAction.search,
                       style: AppTypography.bodyMd.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
                         isDense: true,
                         hintText: 'Search products, categories...',
                         hintStyle: AppTypography.bodyMd.copyWith(
-                          color: AppColors.onSurfaceVariant
+                          color: theme.colorScheme.onSurfaceVariant
                               .withValues(alpha: 0.6),
                         ),
                         border: InputBorder.none,
@@ -359,13 +359,14 @@ class _SearchSuggestions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       children: [
         Text(
           'Popular Searches',
           style: AppTypography.headlineMd.copyWith(
-            color: AppColors.onBackground,
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -381,10 +382,10 @@ class _SearchSuggestions extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: AppColors.outlineVariant.withValues(alpha: 0.5),
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -406,7 +407,7 @@ class _SearchSuggestions extends StatelessWidget {
                     Text(
                       term,
                       style: AppTypography.labelLg.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -423,14 +424,14 @@ class _SearchSuggestions extends StatelessWidget {
             Text(
               'Explore Catalog',
               style: AppTypography.headlineMd.copyWith(
-                color: AppColors.onBackground,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
               ),
             ),
             Text(
               '${products.length} items',
               style: AppTypography.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -466,12 +467,13 @@ class _SearchResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
         boxShadow: [
           BoxShadow(
@@ -502,18 +504,18 @@ class _SearchResultTile extends StatelessWidget {
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, progress) {
                         if (progress == null) return child;
-                        return const ColoredBox(
-                          color: AppColors.surfaceContainerHigh,
+                        return ColoredBox(
+                          color: theme.colorScheme.surfaceContainerHigh,
                         );
                       },
                       errorBuilder: (context, error, stackTrace) =>
-                          const ColoredBox(
-                        color: AppColors.surfaceContainerHigh,
+                          ColoredBox(
+                        color: theme.colorScheme.surfaceContainerHigh,
                         child: Center(
                           child: Icon(
                             CupertinoIcons.photo,
                             size: 20,
-                            color: AppColors.onSurfaceVariant,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -541,7 +543,7 @@ class _SearchResultTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.labelLg.copyWith(
-                          color: AppColors.onSurface,
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
                         ),
@@ -550,7 +552,7 @@ class _SearchResultTile extends StatelessWidget {
                       Text(
                         formatMoney(product.price),
                         style: AppTypography.titleLg.copyWith(
-                          color: AppColors.onBackground,
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
                         ),
@@ -601,6 +603,7 @@ class _NoResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -625,7 +628,7 @@ class _NoResults extends StatelessWidget {
               'No results for "$query"',
               textAlign: TextAlign.center,
               style: AppTypography.headlineMd.copyWith(
-                color: AppColors.onBackground,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -634,7 +637,7 @@ class _NoResults extends StatelessWidget {
               'Try a different keyword or category.',
               textAlign: TextAlign.center,
               style: AppTypography.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -651,22 +654,23 @@ class _SearchErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               CupertinoIcons.wifi_exclamationmark,
               size: 48,
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 16),
             Text(
               "Couldn't load products",
               style: AppTypography.headlineMd.copyWith(
-                color: AppColors.onBackground,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
               ),
             ),

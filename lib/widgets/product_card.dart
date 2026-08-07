@@ -22,17 +22,20 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.9),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.9),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 18,
             spreadRadius: 0,
             offset: const Offset(0, 6),
@@ -72,10 +75,14 @@ class _ProductCardState extends State<ProductCard> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 3),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.8),
+                              color: isDark
+                                  ? const Color(0xFF0F172A).withValues(alpha: 0.8)
+                                  : Colors.white.withValues(alpha: 0.8),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.8),
+                                color: isDark
+                                    ? const Color(0xFF334155).withValues(alpha: 0.8)
+                                    : Colors.white.withValues(alpha: 0.8),
                                 width: 1,
                               ),
                             ),
@@ -93,7 +100,7 @@ class _ProductCardState extends State<ProductCard> {
                                   style: AppTypography.labelMd.copyWith(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.onSurface,
+                                    color: theme.colorScheme.onSurface,
                                   ),
                                 ),
                               ],
@@ -153,7 +160,7 @@ class _ProductCardState extends State<ProductCard> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.labelLg.copyWith(
-                              color: AppColors.onBackground,
+                              color: theme.colorScheme.onSurface,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               height: 1.2,
@@ -168,7 +175,7 @@ class _ProductCardState extends State<ProductCard> {
                             child: Text(
                               formatMoney(widget.product.price),
                               style: AppTypography.titleLg.copyWith(
-                                color: AppColors.onBackground,
+                                color: theme.colorScheme.onSurface,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 15,
                               ),
@@ -225,6 +232,7 @@ class _FavoriteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -234,10 +242,14 @@ class _FavoriteButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: isFavorite
                 ? AppColors.accent.withValues(alpha: 0.18)
-                : Colors.white.withValues(alpha: 0.8),
+                : (isDark
+                    ? const Color(0xFF0F172A).withValues(alpha: 0.8)
+                    : Colors.white.withValues(alpha: 0.8)),
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: isDark
+                  ? const Color(0xFF334155).withValues(alpha: 0.8)
+                  : Colors.white.withValues(alpha: 0.9),
               width: 1,
             ),
             boxShadow: [
@@ -268,7 +280,7 @@ class _FavoriteButton extends StatelessWidget {
                     size: 16,
                     color: isFavorite
                         ? AppColors.accent
-                        : AppColors.onSurfaceVariant,
+                        : (isDark ? Colors.white70 : AppColors.onSurfaceVariant),
                   ),
                 ),
               ),
@@ -287,14 +299,15 @@ class _ProductImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Image.network(
       url,
       fit: BoxFit.cover,
       loadingBuilder: (context, child, progress) {
         if (progress == null) return child;
         return ColoredBox(
-          color: AppColors.chipInactive,
-          child: Center(
+          color: theme.colorScheme.surfaceContainerHigh,
+          child: const Center(
             child: SizedBox(
               width: 20,
               height: 20,
@@ -307,9 +320,9 @@ class _ProductImage extends StatelessWidget {
         );
       },
       errorBuilder: (context, error, stackTrace) => ColoredBox(
-        color: AppColors.chipInactive,
-        child: const Center(
-          child: Icon(CupertinoIcons.photo, color: AppColors.onSurfaceVariant),
+        color: theme.colorScheme.surfaceContainerHigh,
+        child: Center(
+          child: Icon(CupertinoIcons.photo, color: theme.colorScheme.onSurfaceVariant),
         ),
       ),
     );

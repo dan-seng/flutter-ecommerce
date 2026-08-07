@@ -36,7 +36,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -122,14 +121,15 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
+        color: theme.colorScheme.surface.withValues(alpha: 0.85),
         border: Border(
           bottom: BorderSide(
-            color: AppColors.outlineVariant.withValues(alpha: 0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -142,12 +142,12 @@ class _ProfileHeader extends StatelessWidget {
               child: InkWell(
                 onTap: onBack,
                 customBorder: const CircleBorder(),
-                child: const SizedBox(
+                child: SizedBox(
                   width: 40,
                   height: 40,
                   child: Icon(
                     CupertinoIcons.chevron_back,
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                     size: 22,
                   ),
                 ),
@@ -159,7 +159,7 @@ class _ProfileHeader extends StatelessWidget {
             child: Text(
               'Profile',
               style: AppTypography.headlineMd.copyWith(
-                color: AppColors.onBackground,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
                 fontSize: 22,
               ),
@@ -173,12 +173,12 @@ class _ProfileHeader extends StatelessWidget {
               customBorder: const CircleBorder(),
               child: Stack(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 40,
                     height: 40,
                     child: Icon(
                       CupertinoIcons.bell,
-                      color: AppColors.onSurface,
+                      color: theme.colorScheme.onSurface,
                       size: 22,
                     ),
                   ),
@@ -210,13 +210,14 @@ class _ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Colors.white,
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
           width: 1.5,
         ),
         boxShadow: [
@@ -291,7 +292,7 @@ class _ProfileCard extends StatelessWidget {
                       child: Text(
                         'Alex Johnson',
                         style: AppTypography.headlineMd.copyWith(
-                          color: AppColors.onBackground,
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w800,
                           fontSize: 19,
                         ),
@@ -311,7 +312,7 @@ class _ProfileCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.bodyMd.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                     fontSize: 12,
                   ),
                 ),
@@ -366,17 +367,17 @@ class _ProfileCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerLow,
+                  color: theme.colorScheme.surfaceContainerLow,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AppColors.outlineVariant.withValues(alpha: 0.5),
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                   ),
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
                     CupertinoIcons.pencil,
                     size: 17,
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -395,13 +396,14 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
         boxShadow: [
           BoxShadow(
@@ -417,7 +419,7 @@ class _StatsRow extends StatelessWidget {
             return Container(
               width: 1,
               height: 32,
-              color: AppColors.outlineVariant.withValues(alpha: 0.3),
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
             );
           }
           final stat = stats[i ~/ 2];
@@ -432,7 +434,7 @@ class _StatsRow extends StatelessWidget {
                     Text(
                       stat.value,
                       style: AppTypography.headlineMd.copyWith(
-                        color: AppColors.onBackground,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w800,
                         fontSize: 18,
                       ),
@@ -443,7 +445,7 @@ class _StatsRow extends StatelessWidget {
                 Text(
                   stat.label,
                   style: AppTypography.bodyMd.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),

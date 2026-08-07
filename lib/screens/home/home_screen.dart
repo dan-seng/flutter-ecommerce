@@ -290,7 +290,7 @@ class _ProductSection extends StatelessWidget {
             child: Container(
               height: 44,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
                   color: AppColors.primary.withValues(alpha: 0.3),
@@ -634,15 +634,16 @@ class _HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final cart = CartScope.watch(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.85),
+        color: theme.colorScheme.surface.withValues(alpha: 0.85),
         border: Border(
           bottom: BorderSide(
-            color: AppColors.outlineVariant.withValues(alpha: 0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -722,22 +723,22 @@ class _HomeHeader extends StatelessWidget {
                             Text(
                               'Welcome back,',
                               style: AppTypography.labelMd.copyWith(
-                                color: AppColors.onSurfaceVariant,
+                                color: theme.colorScheme.onSurfaceVariant,
                                 fontSize: 10,
                               ),
                             ),
                             const SizedBox(width: 2),
-                            const Icon(
+                            Icon(
                               Icons.keyboard_arrow_down_rounded,
                               size: 13,
-                              color: AppColors.onSurfaceVariant,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ],
                         ),
                         Text(
                           'Alex',
                           style: AppTypography.titleLg.copyWith(
-                            color: AppColors.onSurface,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.w700,
                             fontSize: 15,
                             height: 1.1,
@@ -917,12 +918,13 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant.withValues(alpha: 0.6),
+        color: theme.colorScheme.surfaceContainerHighest,
         shape: BoxShape.circle,
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
       ),
       child: Stack(
@@ -932,7 +934,7 @@ class _HeaderIconButton extends StatelessWidget {
             onPressed: onTap,
             constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
             padding: EdgeInsets.zero,
-            icon: Icon(icon, size: 20, color: AppColors.onSurface),
+            icon: Icon(icon, size: 20, color: theme.colorScheme.onSurface),
           ),
           ?badge,
         ],
@@ -946,6 +948,7 @@ class _DotBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Positioned(
       top: 8,
       right: 8,
@@ -955,7 +958,10 @@ class _DotBadge extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.accent,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 1.5),
+          border: Border.all(
+            color: isDark ? const Color(0xFF0F172A) : Colors.white,
+            width: 1.5,
+          ),
         ),
       ),
     );
@@ -969,6 +975,7 @@ class _CountBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Positioned(
       top: 2,
       right: 2,
@@ -978,7 +985,10 @@ class _CountBadge extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: AppColors.accentGradient,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white, width: 1.5),
+          border: Border.all(
+            color: isDark ? const Color(0xFF0F172A) : Colors.white,
+            width: 1.5,
+          ),
         ),
         child: Text(
           '$count',
@@ -1002,13 +1012,14 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(26),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.6),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
         ),
         boxShadow: [
           BoxShadow(
@@ -1028,12 +1039,12 @@ class _SearchBar extends StatelessWidget {
             child: TextField(
               readOnly: true,
               onTap: onTap,
-              style: AppTypography.bodyMd.copyWith(color: AppColors.onSurface),
+              style: AppTypography.bodyMd.copyWith(color: theme.colorScheme.onSurface),
               decoration: InputDecoration(
                 isDense: true,
                 hintText: 'Search electronics, clothing, jewelry...',
                 hintStyle: AppTypography.bodyMd.copyWith(
-                  color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                   fontSize: 13,
                 ),
                 border: InputBorder.none,
@@ -1084,6 +1095,7 @@ class _CategoryChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -1104,12 +1116,12 @@ class _CategoryChips extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 gradient: selected ? AppColors.primaryGradient : null,
-                color: selected ? null : AppColors.surface,
+                color: selected ? null : theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: selected
                       ? Colors.transparent
-                      : AppColors.outlineVariant.withValues(alpha: 0.6),
+                      : theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
                 ),
                 boxShadow: selected
                     ? [
@@ -1133,13 +1145,13 @@ class _CategoryChips extends StatelessWidget {
                   Icon(
                     iconData,
                     size: 16,
-                    color: selected ? Colors.white : AppColors.onSurfaceVariant,
+                    color: selected ? Colors.white : theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     categoryName,
                     style: AppTypography.labelMd.copyWith(
-                      color: selected ? Colors.white : AppColors.onSurfaceVariant,
+                      color: selected ? Colors.white : theme.colorScheme.onSurfaceVariant,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                       fontSize: 13,
                     ),
@@ -1334,7 +1346,7 @@ class _ProductSectionHeader extends StatelessWidget {
             Text(
               title,
               style: AppTypography.headlineMd.copyWith(
-                color: AppColors.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
               ),
@@ -1376,20 +1388,14 @@ class _BentoHighlight extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       height: 160,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primaryContainer,
-            AppColors.surfaceContainerLow,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.15),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
           width: 1,
         ),
         boxShadow: [
@@ -1437,7 +1443,7 @@ class _BentoHighlight extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.headlineMd.copyWith(
-                        color: AppColors.onBackground,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                         fontSize: 15,
                       ),

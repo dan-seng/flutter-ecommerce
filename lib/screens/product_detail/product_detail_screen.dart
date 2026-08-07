@@ -101,16 +101,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _showSizePicker() {
+    final theme = Theme.of(context);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) {
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: theme.colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
             ),
           ),
           child: SafeArea(
@@ -125,7 +126,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       width: 36,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppColors.outlineVariant,
+                        color: theme.colorScheme.outlineVariant,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -136,7 +137,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: Text(
                       'Size (US)',
                       style: AppTypography.headlineMd.copyWith(
-                        color: AppColors.onBackground,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -161,19 +162,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             gradient: selected ? AppColors.primaryGradient : null,
                             color: selected
                                 ? null
-                                : AppColors.surfaceContainerLow,
+                                : theme.colorScheme.surfaceContainerLow,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: selected
                                   ? Colors.transparent
-                                  : AppColors.outlineVariant
+                                  : theme.colorScheme.outlineVariant
                                       .withValues(alpha: 0.5),
                             ),
                           ),
                           child: Text(
                             size,
                             style: AppTypography.labelLg.copyWith(
-                              color: selected ? Colors.white : AppColors.onSurface,
+                              color: selected ? Colors.white : theme.colorScheme.onSurface,
                               fontWeight:
                                   selected ? FontWeight.w800 : FontWeight.w600,
                             ),
@@ -193,11 +194,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final product = _product;
     final images = [product.imageUrl];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           ListView(
@@ -211,12 +213,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: theme.colorScheme.surface,
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(32)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
                       blurRadius: 24,
                       offset: const Offset(0, -8),
                     ),
@@ -289,7 +291,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.headlineLgMobile.copyWith(
-                              color: AppColors.onBackground,
+                              color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w800,
                               fontSize: 22,
                             ),
@@ -321,7 +323,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.bodyMd.copyWith(
-                              color: AppColors.onSurfaceVariant,
+                              color: theme.colorScheme.onSurfaceVariant,
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                             ),
@@ -333,7 +335,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(
                       'Color: ${_colorNames[_selectedColor]}',
                       style: AppTypography.labelLg.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -353,7 +355,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               border: Border.all(
                                 color: selected
                                     ? AppColors.primary
-                                    : AppColors.outlineVariant,
+                                    : theme.colorScheme.outlineVariant,
                                 width: selected ? 2.5 : 1,
                               ),
                               borderRadius: BorderRadius.circular(16),
@@ -395,7 +397,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       decoration: BoxDecoration(
                         border: Border(
                           top: BorderSide(
-                            color: AppColors.outlineVariant
+                            color: theme.colorScheme.outlineVariant
                                 .withValues(alpha: 0.4),
                           ),
                         ),
@@ -408,7 +410,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: Text(
                               product.description,
                               style: AppTypography.bodyMd.copyWith(
-                                color: AppColors.onSurfaceVariant,
+                                color: theme.colorScheme.onSurfaceVariant,
                                 height: 1.5,
                                 fontSize: 14,
                               ),
@@ -449,7 +451,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: Text(
                         'You Might Also Like',
                         style: AppTypography.headlineMd.copyWith(
-                          color: AppColors.onBackground,
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -524,16 +526,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           height: 80,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.85),
+            color: theme.colorScheme.surface.withValues(alpha: 0.85),
             border: Border(
               top: BorderSide(
-                color: Colors.white.withValues(alpha: 0.9),
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                 width: 1.2,
               ),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
+                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
                 blurRadius: 24,
                 offset: const Offset(0, -6),
               ),
@@ -666,6 +668,9 @@ class _RoundIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       width: 40,
       height: 40,
@@ -675,10 +680,14 @@ class _RoundIconButton extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: isDark
+                  ? const Color(0xFF0F172A).withValues(alpha: 0.8)
+                  : Colors.white.withValues(alpha: 0.8),
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.9),
+                color: isDark
+                    ? const Color(0xFF334155).withValues(alpha: 0.8)
+                    : Colors.white.withValues(alpha: 0.9),
                 width: 1,
               ),
               boxShadow: [
@@ -699,7 +708,7 @@ class _RoundIconButton extends StatelessWidget {
                   child: Icon(
                     icon,
                     size: 20,
-                    color: iconColor ?? AppColors.onSurface,
+                    color: iconColor ?? theme.colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -746,13 +755,14 @@ class _QuantitySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Quantity',
           style: AppTypography.labelLg.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -761,10 +771,10 @@ class _QuantitySelector extends StatelessWidget {
           height: 48,
           padding: const EdgeInsets.symmetric(horizontal: 6),
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainerLow,
+            color: theme.colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppColors.outlineVariant.withValues(alpha: 0.4),
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
             ),
           ),
           child: Row(
@@ -782,7 +792,7 @@ class _QuantitySelector extends StatelessWidget {
                   '$quantity',
                   textAlign: TextAlign.center,
                   style: AppTypography.titleLg.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -808,8 +818,9 @@ class _QuantityButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Material(
-      color: Colors.white,
+      color: theme.colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         onTap: onTap,
@@ -834,13 +845,14 @@ class _SizeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Size (US)',
           style: AppTypography.labelLg.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -852,10 +864,10 @@ class _SizeSelector extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLow,
+              color: theme.colorScheme.surfaceContainerLow,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppColors.outlineVariant.withValues(alpha: 0.4),
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
               ),
             ),
             child: Row(
@@ -863,15 +875,15 @@ class _SizeSelector extends StatelessWidget {
                 Text(
                   size,
                   style: AppTypography.bodyLg.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const Spacer(),
-                const Icon(
+                Icon(
                   CupertinoIcons.chevron_down,
                   size: 16,
-                  color: AppColors.outline,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ],
             ),
@@ -887,13 +899,14 @@ class _DeliveryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.4),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
@@ -928,7 +941,7 @@ class _DeliveryCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.labelLg.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -938,7 +951,7 @@ class _DeliveryCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTypography.bodyMd.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                     fontSize: 12,
                   ),
                 ),
@@ -971,11 +984,12 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: AppColors.outlineVariant.withValues(alpha: 0.4),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
           ),
         ),
       ),
@@ -992,7 +1006,7 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                     child: Text(
                       widget.title,
                       style: AppTypography.titleLg.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1000,10 +1014,10 @@ class _ExpandableSectionState extends State<_ExpandableSection> {
                   AnimatedRotation(
                     turns: _expanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
-                    child: const Icon(
+                    child: Icon(
                       CupertinoIcons.chevron_down,
                       size: 16,
-                      color: AppColors.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -1029,6 +1043,7 @@ class _SpecRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -1037,12 +1052,12 @@ class _SpecRow extends StatelessWidget {
           Text(
             label,
             style: AppTypography.bodyMd
-                .copyWith(color: AppColors.onSurfaceVariant),
+                .copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
           Text(
             value,
             style: AppTypography.bodyMd.copyWith(
-              color: AppColors.onSurface,
+              color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1060,6 +1075,7 @@ class _RelatedRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
       height: 240,
       child: ListView.separated(
@@ -1073,10 +1089,10 @@ class _RelatedRow extends StatelessWidget {
             child: Container(
               width: 155,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppColors.outlineVariant.withValues(alpha: 0.5),
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -1100,17 +1116,17 @@ class _RelatedRow extends StatelessWidget {
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, progress) {
                             if (progress == null) return child;
-                            return const ColoredBox(
-                              color: AppColors.surfaceContainerHigh,
+                            return ColoredBox(
+                              color: theme.colorScheme.surfaceContainerHigh,
                             );
                           },
                           errorBuilder: (context, error, stackTrace) =>
-                              const ColoredBox(
-                            color: AppColors.surfaceContainerHigh,
+                              ColoredBox(
+                            color: theme.colorScheme.surfaceContainerHigh,
                             child: Center(
                               child: Icon(
                                 CupertinoIcons.photo,
-                                color: AppColors.onSurfaceVariant,
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ),
@@ -1139,7 +1155,7 @@ class _RelatedRow extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTypography.labelLg.copyWith(
-                            color: AppColors.onBackground,
+                            color: theme.colorScheme.onSurface,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
@@ -1148,7 +1164,7 @@ class _RelatedRow extends StatelessWidget {
                         Text(
                           formatMoney(product.price),
                           style: AppTypography.labelLg.copyWith(
-                            color: AppColors.onBackground,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.w800,
                             fontSize: 14,
                           ),
