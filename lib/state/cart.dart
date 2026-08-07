@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/cart_item.dart';
+import '../models/product.dart';
 import '../services/firestore_service.dart';
 
 class Cart extends ChangeNotifier {
@@ -8,9 +9,11 @@ class Cart extends ChangeNotifier {
 
   final FirestoreService _firestore;
   final List<CartItem> _items = [];
+  final List<Product> _wishlist = [];
   String? _userId;
 
   List<CartItem> get items => List.unmodifiable(_items);
+  List<Product> get wishlist => List.unmodifiable(_wishlist);
 
   bool get isEmpty => _items.isEmpty;
 
@@ -20,9 +23,30 @@ class Cart extends ChangeNotifier {
 
   void setUser(String? uid) {
     _userId = uid;
-    if (_userId != null && _items.isNotEmpty) {
+    if (_userId != null && (_items.isNotEmpty || _wishlist.isNotEmpty)) {
       _syncToFirestore();
     }
+  }
+
+  bool isFavorite(Product product) {
+    return _wishlist.any((p) => p.id == product.id);
+  }
+
+  void toggleFavorite(Product product) {
+    final index = _wishlist.indexWhere((p) => p.id == product.id);
+    if (index >= 0) {
+      _wishlist.removeAt(index);
+    } else {
+      _wishlist.add(product);
+    }
+    notifyListeners();
+    _syncToFirestore();
+  }
+
+  void removeFavorite(Product product) {
+    _wishlist.removeWhere((p) => p.id == product.id);
+    notifyListeners();
+    _syncToFirestore();
   }
 
   void add(CartItem item) {
@@ -66,6 +90,7 @@ class Cart extends ChangeNotifier {
   void _syncToFirestore() {
     if (_userId != null) {
       _firestore.saveUserCart(_userId!, _items);
+      _firestore.saveUserWishlist(_userId!, _wishlist);
     }
   }
 }

@@ -3,10 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/product.dart';
+import '../state/cart_scope.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
 
-class ProductCard extends StatefulWidget {
+class ProductCard extends StatelessWidget {
   const ProductCard({super.key, required this.product, this.onTap, this.onAdd});
 
   final Product product;
@@ -14,16 +15,11 @@ class ProductCard extends StatefulWidget {
   final VoidCallback? onAdd;
 
   @override
-  State<ProductCard> createState() => _ProductCardState();
-}
-
-class _ProductCardState extends State<ProductCard> {
-  bool _isFavorite = false;
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final cart = CartScope.watch(context);
+    final isFavorite = cart.isFavorite(product);
 
     return Container(
       decoration: BoxDecoration(
@@ -51,7 +47,7 @@ class _ProductCardState extends State<ProductCard> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: widget.onTap,
+          onTap: onTap,
           splashColor: AppColors.primary.withValues(alpha: 0.08),
           highlightColor: AppColors.primary.withValues(alpha: 0.04),
           child: Column(
@@ -62,8 +58,7 @@ class _ProductCardState extends State<ProductCard> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    _ProductImage(url: widget.product.imageUrl),
-                    // Rating Pill Overlay (iOS Frosted Glass)
+                    _ProductImage(url: product.imageUrl),
                     Positioned(
                       bottom: 6,
                       left: 6,
@@ -96,7 +91,7 @@ class _ProductCardState extends State<ProductCard> {
                                 ),
                                 const SizedBox(width: 3),
                                 Text(
-                                  '${widget.product.rating}',
+                                  '${product.rating}',
                                   style: AppTypography.labelMd.copyWith(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
@@ -109,16 +104,13 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                       ),
                     ),
-                    // Favorite Toggle Button (iOS Frosted Glass)
                     Positioned(
                       top: 6,
                       right: 6,
                       child: _FavoriteButton(
-                        isFavorite: _isFavorite,
+                        isFavorite: isFavorite,
                         onToggle: () {
-                          setState(() {
-                            _isFavorite = !_isFavorite;
-                          });
+                          CartScope.read(context).toggleFavorite(product);
                         },
                       ),
                     ),
@@ -145,7 +137,7 @@ class _ProductCardState extends State<ProductCard> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              widget.product.category.toUpperCase(),
+                              product.category.toUpperCase(),
                               style: AppTypography.labelMd.copyWith(
                                 color: AppColors.primary,
                                 fontSize: 9,
@@ -156,7 +148,7 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            widget.product.name,
+                            product.name,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.labelLg.copyWith(
@@ -173,7 +165,7 @@ class _ProductCardState extends State<ProductCard> {
                         children: [
                           Expanded(
                             child: Text(
-                              formatMoney(widget.product.price),
+                              formatMoney(product.price),
                               style: AppTypography.titleLg.copyWith(
                                 color: theme.colorScheme.onSurface,
                                 fontWeight: FontWeight.w800,
@@ -198,7 +190,7 @@ class _ProductCardState extends State<ProductCard> {
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: widget.onAdd,
+                                onTap: onAdd,
                                 borderRadius: BorderRadius.circular(10),
                                 child: const Center(
                                   child: Icon(
