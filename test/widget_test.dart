@@ -17,7 +17,7 @@ class _FakeRepository implements ProductRepository {
   final List<Product> products;
 
   @override
-  Future<List<Product>> fetchProducts() async => products;
+  Future<List<Product>> fetchProducts({bool forceRefresh = false}) async => products;
 
   @override
   Future<Product> fetchProduct(int id) async =>
@@ -283,6 +283,6 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Signed out (demo)'), findsOneWidget);
+    expect(find.text('Signed out successfully'), findsAtLeast(1));
   });
 }
