@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AppUser {
@@ -160,40 +159,13 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> signInWithFacebook() async {
-    _setLoading(true);
-    try {
-      if (_auth != null) {
-        final LoginResult result = await FacebookAuth.instance.login(
-          permissions: ['email', 'public_profile'],
-        );
-        if (result.status == LoginStatus.success) {
-          final OAuthCredential credential = FacebookAuthProvider.credential(
-            result.accessToken!.tokenString,
-          );
-          final userCredential = await _auth.signInWithCredential(credential);
-          if (userCredential.user != null) {
-            _currentUser = AppUser.fromFirebase(userCredential.user!);
-          }
-        }
-      } else {
-        await Future<void>.delayed(const Duration(milliseconds: 600));
-        _currentUser = const AppUser(
-          uid: 'fb_user_888',
-          email: 'alex.facebook@example.com',
-          displayName: 'Alex (Facebook)',
-        );
-      }
-    } finally {
-      _setLoading(false);
-    }
-  }
-
   Future<void> sendPasswordReset(String email) async {
+    final cleanEmail = email.trim();
+    debugPrint('Password reset requested for: $cleanEmail (Firebase Auth active: ${_auth != null})');
     if (_auth != null) {
-      await _auth.sendPasswordResetEmail(email: email.trim());
+      await _auth.sendPasswordResetEmail(email: cleanEmail);
     } else {
-      await Future<void>.delayed(const Duration(milliseconds: 400));
+      await Future<void>.delayed(const Duration(milliseconds: 600));
     }
   }
 
@@ -201,9 +173,12 @@ class AuthService extends ChangeNotifier {
     _setLoading(true);
     try {
       if (_auth != null) {
-        await _auth.signOut();
-        await GoogleSignIn.instance.signOut();
-        await FacebookAuth.instance.logOut();
+        try {
+          await _auth.signOut();
+        } catch (_) {}
+        try {
+          await GoogleSignIn.instance.signOut();
+        } catch (_) {}
       }
       _currentUser = null;
     } finally {
