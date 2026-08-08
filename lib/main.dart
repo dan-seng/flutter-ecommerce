@@ -15,6 +15,8 @@ import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 100 * 1024 * 1024;
+  PaintingBinding.instance.imageCache.maximumSize = 100;
   try {
     await Firebase.initializeApp();
   } catch (e) {
@@ -35,7 +37,9 @@ class GebeyaApp extends StatefulWidget {
 
 class _GebeyaAppState extends State<GebeyaApp> {
   final Cart _cart = Cart();
-  late final AuthService _authService = AuthService(initialUser: widget.initialUser);
+  late final AuthService _authService = AuthService(
+    initialUser: widget.initialUser,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +52,7 @@ class _GebeyaAppState extends State<GebeyaApp> {
             builder: (context) {
               final themeController = ThemeScope.of(context);
               return MaterialApp(
-                title: 'Gebeya Luxe',
+                title: 'Gebeya',
                 debugShowCheckedModeBanner: false,
                 theme: buildAppTheme(),
                 darkTheme: buildAppDarkTheme(),
@@ -91,11 +95,7 @@ class _AppFlowGateState extends State<AppFlowGate> {
   @override
   Widget build(BuildContext context) {
     if (_hasSeenOnboarding == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (!_hasSeenOnboarding!) {
