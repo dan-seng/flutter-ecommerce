@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../services/biometric_service.dart';
 import '../../state/auth_scope.dart';
 import '../../state/cart_scope.dart';
 import '../../state/theme_scope.dart';
@@ -16,6 +17,20 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _notificationsEnabled = true;
+  bool _biometricEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricPref();
+  }
+
+  Future<void> _loadBiometricPref() async {
+    final enabled = await BiometricService.isEnabled();
+    if (mounted) {
+      setState(() => _biometricEnabled = enabled);
+    }
+  }
 
   static const _generalItems = [
     (icon: CupertinoIcons.gear, label: 'Settings', badge: null),
@@ -67,6 +82,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: 'Preferences',
                         items: _generalItems,
                         extraTiles: [
+                          _SwitchTile(
+                            icon: Icons.fingerprint,
+                            label: 'Fingerprint & Face ID',
+                            value: _biometricEnabled,
+                            onChanged: (val) async {
+                              setState(() => _biometricEnabled = val);
+                              await BiometricService.setEnabled(val);
+                            },
+                          ),
                           _SwitchTile(
                             icon: CupertinoIcons.bell_fill,
                             label: 'Push Notifications',
@@ -231,23 +255,29 @@ class _ProfileCard extends StatelessWidget {
     final email = userEmail ?? 'Not signed in';
     final initial = name.isNotEmpty ? name[0].toUpperCase() : 'U';
 
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: isDark
+            ? theme.colorScheme.surfaceContainerHigh
+            : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+          color: isDark
+              ? AppColors.primary.withValues(alpha: 0.25)
+              : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.06),
+            color: AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.06),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -264,13 +294,15 @@ class _ProfileCard extends StatelessWidget {
                   gradient: AppColors.primaryGradient,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white,
+                    color: isDark
+                        ? theme.colorScheme.surface
+                        : Colors.white,
                     width: 3.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.35),
-                      blurRadius: 14,
+                      color: AppColors.primary.withValues(alpha: 0.4),
+                      blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -293,9 +325,13 @@ class _ProfileCard extends StatelessWidget {
                   width: 18,
                   height: 18,
                   decoration: BoxDecoration(
-                    color: auth.isLoggedIn ? const Color(0xFF10B981) : AppColors.outline,
+                    color: auth.isLoggedIn
+                        ? const Color(0xFF10B981)
+                        : AppColors.outline,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2.5),
+                    border: Border.all(
+                        color: isDark ? theme.colorScheme.surface : Colors.white,
+                        width: 2.5),
                   ),
                 ),
               ),
@@ -379,17 +415,23 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: isDark
+            ? theme.colorScheme.surfaceContainerHigh
+            : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+          color: isDark
+              ? AppColors.primary.withValues(alpha: 0.2)
+              : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -453,6 +495,9 @@ class _QuickShortcutsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Row(
       children: List.generate(_items.length, (index) {
         final item = _items[index];
@@ -460,7 +505,9 @@ class _QuickShortcutsGrid extends StatelessWidget {
           child: Container(
             margin: EdgeInsets.only(right: index == _items.length - 1 ? 0 : 10),
             child: Material(
-              color: Theme.of(context).colorScheme.surface,
+              color: isDark
+                  ? theme.colorScheme.surfaceContainerHigh
+                  : theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
@@ -470,7 +517,9 @@ class _QuickShortcutsGrid extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: AppColors.outlineVariant.withValues(alpha: 0.4),
+                      color: isDark
+                          ? AppColors.primary.withValues(alpha: 0.18)
+                          : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                     ),
                   ),
                   child: Column(
@@ -479,7 +528,7 @@ class _QuickShortcutsGrid extends StatelessWidget {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: item.color.withValues(alpha: 0.1),
+                          color: item.color.withValues(alpha: isDark ? 0.22 : 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(item.icon, size: 20, color: item.color),
@@ -490,7 +539,7 @@ class _QuickShortcutsGrid extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.labelMd.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w700,
                           fontSize: 11,
                         ),
@@ -520,6 +569,9 @@ class _MenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -528,7 +580,7 @@ class _MenuSection extends StatelessWidget {
           child: Text(
             title.toUpperCase(),
             style: AppTypography.labelLg.copyWith(
-              color: AppColors.outline,
+              color: theme.colorScheme.onSurfaceVariant,
               fontSize: 11,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.1,
@@ -537,14 +589,18 @@ class _MenuSection extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
+            color: isDark
+                ? theme.colorScheme.surfaceContainerHigh
+                : theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: AppColors.outlineVariant.withValues(alpha: 0.4),
+              color: isDark
+                  ? AppColors.primary.withValues(alpha: 0.18)
+                  : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -609,6 +665,7 @@ class _MenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: () => _showComingSoon(context, label),
       child: Padding(
@@ -629,7 +686,7 @@ class _MenuTile extends StatelessWidget {
               child: Text(
                 label,
                 style: AppTypography.bodyLg.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
                 ),
@@ -639,17 +696,17 @@ class _MenuTile extends StatelessWidget {
               Text(
                 badge!,
                 style: AppTypography.bodyMd.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(width: 8),
             ],
-            const Icon(
+            Icon(
               CupertinoIcons.chevron_right,
               size: 16,
-              color: AppColors.outline,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
           ],
         ),
@@ -673,6 +730,7 @@ class _SwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
@@ -691,7 +749,7 @@ class _SwitchTile extends StatelessWidget {
             child: Text(
               label,
               style: AppTypography.bodyLg.copyWith(
-                color: AppColors.onSurface,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
               ),
@@ -734,23 +792,22 @@ class _SignOutButton extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () async {
-            if (isLoggedIn) {
-              await AuthScope.read(context).signOut();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    const SnackBar(
-                      content: Text('Signed out (demo)'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-              }
-            } else {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
+            final auth = AuthScope.read(context);
+            await auth.signOut();
+            if (context.mounted) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  const SnackBar(
+                    content: Text('Signed out successfully'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              Navigator.of(context).pushAndRemoveUntil(
+                CupertinoPageRoute<void>(
                   builder: (_) => const LoginScreen(),
                 ),
+                (route) => false,
               );
             }
           },
