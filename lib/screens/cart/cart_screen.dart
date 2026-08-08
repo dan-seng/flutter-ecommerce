@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/cart_item.dart';
+import '../../services/biometric_service.dart';
 import '../../state/auth_scope.dart';
 import '../../state/cart.dart';
 import '../../state/cart_scope.dart';
@@ -397,6 +398,14 @@ class _CartSummaryState extends State<_CartSummary> {
     final auth = AuthScope.read(context);
     final email = auth.currentUser?.email ?? 'customer@gebeya.com';
 
+    // Device security check (Fingerprint, Face ID, PIN, or Pattern)
+    final bool authOk = await BiometricService.authenticate(
+      reason:
+          'Verify your identity (Fingerprint, PIN, or Pattern) to proceed with Checkout',
+    );
+    if (!authOk) return;
+
+    if (!mounted) return;
     final result = await StripePaymentSheetModal.show(
       context: context,
       amount: widget.cart.totalPrice,
